@@ -62,7 +62,10 @@ Run this checklist before every release for admin panels, widget settings, and b
 
 ---
 
-## Product-Specific: Elementor Widget Panels (TPA)
+## Product-Specific: Elementor Widget Panels
+
+<!-- Replace or add your own product-specific UI checks below. -->
+<!-- Example checks for Elementor-based plugins: -->
 
 - [ ] **Widget settings panel doesn't overflow** on narrow Elementor sidebar (320px wide).
 - [ ] **Section tabs navigable by keyboard** (Tab key cycles through).
@@ -72,7 +75,10 @@ Run this checklist before every release for admin panels, widget settings, and b
 
 ---
 
-## Product-Specific: Gutenberg Block Panels (NexterWP)
+## Product-Specific: Gutenberg Block Panels
+
+<!-- Replace or add your own product-specific UI checks below. -->
+<!-- Example checks for Gutenberg block plugins: -->
 
 - [ ] **Block controls in correct Inspector section** — Style, Settings, Advanced tabs used correctly.
 - [ ] **Block doesn't break on empty/default state** — no white-screen with zero content.

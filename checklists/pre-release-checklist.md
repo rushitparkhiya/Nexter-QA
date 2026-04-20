@@ -1,5 +1,5 @@
 # Pre-Release Checklist
-> Run every item before tagging a release for The Plus Addons, NexterWP, or any POSIMYTH plugin.
+> Run every item before tagging a release for your WordPress plugin.
 
 ---
 

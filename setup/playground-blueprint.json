@@ -23,7 +23,7 @@
     {
       "step": "setSiteOptions",
       "options": {
-        "blogname": "POSIMYTH QA Test Site",
+        "blogname": "Plugin QA Test Site",
         "blogdescription": "Automated QA testing environment"
       }
     },
