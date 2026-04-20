@@ -152,6 +152,32 @@ async function countElements(page, selector) {
   return page.evaluate((sel) => document.querySelectorAll(sel).length, selector);
 }
 
+// ─── snapPair — save screenshot with enforced pair-NN-slug-side naming ────────
+// ALWAYS use this instead of page.screenshot() in flow specs.
+// Enforces the contract that the report generator depends on.
+//
+// Example:
+//   await snapPair(page, 1, 'dashboard', 'a', SNAP_DIR);            // pair-01-dashboard-a.png
+//   await snapPair(page, 1, 'dashboard', 'a', SNAP_DIR, 'scroll');  // pair-01-dashboard-a-scroll.png
+//
+// Naming rules:
+//   pairNum : integer 1–99. Pairs plugins by feature topic, not by test order.
+//   slug    : short topic name, lowercase, hyphens only (dashboard, social, sitemaps)
+//   side    : 'a' = plugin under test (left), 'b' = competitor (right)
+//   extra   : optional suffix for multiple shots in same flow (scroll, modal, form)
+
+const path = require('path');
+const fs   = require('fs');
+
+async function snapPair(page, pairNum, slug, side, snapDir, extra = '') {
+  fs.mkdirSync(snapDir, { recursive: true });
+  const num    = String(pairNum).padStart(2, '0');
+  const suffix = extra ? `-${extra}` : '';
+  const file   = path.join(snapDir, `pair-${num}-${slug}-${side}${suffix}.png`);
+  await page.screenshot({ path: file, fullPage: true });
+  return file;
+}
+
 // ─── checkFrontend — check meta/schema/OG on any URL ─────────────────────────
 // Returns a data object with all key SEO signals. Use in any test.
 
@@ -192,5 +218,6 @@ module.exports = {
   waitForReady,
   countElements,
   checkFrontend,
+  snapPair,
   ADMIN_BASE,
 };
