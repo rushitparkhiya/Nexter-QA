@@ -23,20 +23,31 @@ Usage:
     --videos reports/videos \\
     --out    reports/uat-report.html
 """
-import argparse, base64, os, re
+import argparse, base64, json, os, re
 from datetime import datetime
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--title",   default="UAT Flow Report")
-parser.add_argument("--out",     default="reports/uat-report.html")
-parser.add_argument("--snaps",   default="reports/screenshots/flows-compare")
-parser.add_argument("--videos",  default="reports/videos")
-parser.add_argument("--label-a", default="",  dest="label_a",
+parser.add_argument("--title",     default="UAT Flow Report")
+parser.add_argument("--out",       default="reports/uat-report.html")
+parser.add_argument("--snaps",     default="reports/screenshots/flows-compare")
+parser.add_argument("--videos",    default="reports/videos")
+parser.add_argument("--label-a",   default="",  dest="label_a",
                     help="Display name for plugin A (auto-detected from filenames if omitted)")
-parser.add_argument("--label-b", default="",  dest="label_b",
+parser.add_argument("--label-b",   default="",  dest="label_b",
                     help="Display name for plugin B")
+parser.add_argument("--flow-data", default="",  dest="flow_data",
+                    help="Path to a JSON file containing FLOW_DATA, RICE, and FEATURES. "
+                         "When omitted the report shows only screenshots/videos with no PM analysis.")
 args = parser.parse_args()
 SNAP = args.snaps; VDIR = args.videos; OUT = args.out; TITLE = args.title
+
+# ── Load external PM data or fall back to empty defaults ─────────────────────
+_fd = {}
+if args.flow_data and os.path.exists(args.flow_data):
+    with open(args.flow_data) as _f:
+        _fd = json.load(_f)
+    # Convert string keys (JSON) back to int keys for FLOW_DATA
+    _fd["FLOW_DATA"] = {int(k): v for k, v in _fd.get("FLOW_DATA", {}).items()}
 
 # ── Media helpers ─────────────────────────────────────────────────────────────
 def b64(path, mime):
@@ -64,7 +75,7 @@ def scan_pairs(directory, ext):
     pairs = {}
     if not os.path.isdir(directory):
         return pairs
-    pat = re.compile(r'^pair-(\d{2,})-(.+?)-(a|b)(?:-\w+)?\.' + re.escape(ext.lstrip('.')) + '$')
+    pat = re.compile(r'^pair-(\d{2,})-(.+?)-(a|b)(?:-[\w-]+)?\.' + re.escape(ext.lstrip('.')) + '$')
     for f in sorted(os.listdir(directory)):
         m = pat.match(f)
         if not m: continue
@@ -89,237 +100,17 @@ tot_v = sum(len(v['a']) + len(v['b']) for v in vid_pairs.values())
 tot_f = len(nums)
 now   = datetime.now().strftime("%Y-%m-%d %H:%M")
 
-# ── RICE Data ─────────────────────────────────────────────────────────────────
-RICE = [
- {"r":1,  "n":"LLMs.txt — rewrite flush on save",              "s":54000,"reach":18000,"imp":"MASSIVE","eff":"XS","t":"qw","q":1,"note":"Flagship differentiator. 404 on fresh install. One rewrite rule fix. Ship in days, not weeks."},
- {"r":2,  "n":"Redirections — add WP admin submenu item",       "s":30000,"reach":15000,"imp":"HIGH",   "eff":"XS","t":"qw","q":1,"note":"Feature exists but buried 3 clicks in. Adding a WP submenu entry is 2 hours of work with massive discovery impact."},
- {"r":3,  "n":"Default OG image uploader on Social page",       "s":28000,"reach":14000,"imp":"HIGH",   "eff":"XS","t":"qw","q":1,"note":"Most-used social SEO setting. Should be the hero element on Social settings page with image preview."},
- {"r":4,  "n":"Getting started checklist — new user onboarding","s":16000,"reach":16000,"imp":"MED",    "eff":"XS","t":"qw","q":1,"note":"Blank dashboard kills activation. A 5-step checklist drives feature discovery and reduces churn in week 1."},
- {"r":5,  "n":"Sitemap URL — display + copy button prominently","s":13000,"reach":13000,"imp":"MED",    "eff":"XS","t":"qw","q":1,"note":"Users need the sitemap URL for Google Search Console. Should be on page with one-click copy."},
- {"r":6,  "n":"Dashboard redesign — module status + health score","s":12000,"reach":18000,"imp":"HIGH", "eff":"S", "t":"qw","q":1,"note":"First impression is currently empty. RankMath shows full module grid. NXT dashboard needs complete redesign."},
- {"r":7,  "n":"404 Monitor module",                             "s":4800, "reach":12000,"imp":"HIGH",   "eff":"M", "t":"bb","q":1,"note":"Table-stakes for professional sites. Every site gets 404s — tracking them is essential."},
- {"r":8,  "n":"Instant Indexing — auto-submit on post publish", "s":4267, "reach":8000, "imp":"HIGH",   "eff":"S", "t":"fi","q":1,"note":"Manual submission is friction. Auto-submit on publish is what users expect from IndexNow."},
- {"r":9,  "n":"Meta Templates — per-post-type tabs",            "s":2880, "reach":9000, "imp":"HIGH",   "eff":"M", "t":"bb","q":2,"note":"RM has 14 tabs. NXT has 1 page. Power users need Posts vs Pages vs CPTs vs Archives controlled separately."},
- {"r":10, "n":"Breadcrumbs settings + schema markup",           "s":2267, "reach":8500, "imp":"MED",    "eff":"S", "t":"fi","q":2,"note":"60% of SEO sites use breadcrumbs. Missing entirely from NXT nav."},
- {"r":11, "n":"LLMs.txt — preview + auto-generate from site",   "s":1920, "reach":6000, "imp":"HIGH",   "eff":"M", "t":"bb","q":2,"note":"After fixing the 404, show generated file preview, auto-populate from pages and posts."},
- {"r":12, "n":"Per-post schema type in Gutenberg sidebar",       "s":1400, "reach":7000, "imp":"HIGH",   "eff":"L", "t":"bb","q":2,"note":"RM lets you set Article/Product/FAQ per post in editor. NXT schema appears to be global only."},
-]
+# ── RICE Data — loaded from --flow-data JSON or empty ─────────────────────────
+RICE = _fd.get("RICE", [])
 
-# ── Per-flow deep PM analysis ─────────────────────────────────────────────────
-# Key = pair number. Must match the NN in screenshot/video filenames.
-# 'slug' must match the slug in filenames: pair-NN-{slug}-a.png
-FLOW_DATA = {
-1: {
-    "slug":    "dashboard",
-    "title":   "Dashboard & Audit",
-    "verdict": "🔴 Needs Redesign",
-    "a_summary": "Single audit panel with a Run Checks button. Page is empty until the audit runs. No module status, no health score.",
-    "b_summary": "Module overview grid with toggle switches. Users see the full feature set immediately. Quick stats visible on load.",
-    "pm_analysis": """
-<p>The dashboard is the first screen every user sees after installing the plugin, and right now it creates a deeply wrong first impression. The entire screen shows a heading "Site SEO Audit," a "Run Checks" button, and the message "No audit yet. Use Run Checks above." That is it. Nothing else until the user manually triggers a scan.</p>
-<p>This is a critical activation problem. Activation is the moment a user first realizes value from your product. Plugin B passes this test immediately — open the dashboard and you see a grid of all active modules with on/off toggles. Users instantly understand what the plugin does, what is enabled, and what they might want to configure. Plugin A fails this test entirely because there is nothing to see.</p>
-<p>The audit feature itself is a strong differentiator — automated site-wide SEO checks covering technical, on-page, WordPress settings, and integrations. But burying it as the only visible element on an empty dashboard makes it feel like a minimal product rather than a comprehensive SEO suite.</p>
-<p><strong>What the dashboard should show:</strong> (1) An SEO health score — 0–100 from the last audit. (2) A module status row — icons showing Sitemap ✓, Schema ✓, Redirections ✓, LLMs.txt ✓/✗. (3) Quick stats — sitemap URL with copy button, active redirections count, last audit date. (4) A getting-started checklist for new installs with 5 steps: Connect to Google, Set up sitemap, Configure meta templates, Enable LLMs.txt, Run first audit.</p>
-<p><strong>RICE impact:</strong> Dashboard redesign scores 12,000 RICE. A new user onboarding checklist alone scores 16,000 — the highest XS-effort item after the LLMs.txt fix. These two changes together would dramatically improve week-1 activation and reduce users who install and think "this plugin doesn't do much."</p>
-""",
-    "gaps":    ["No module status visible on load", "No SEO health score", "No getting-started guidance for new users", "Audit is the only visible feature — hides full product depth"],
-    "wins":    ["SEO Audit concept is genuinely useful", "Clean, uncluttered layout (but too empty)"],
-    "actions": ["Add module status grid — 1 sprint", "Add getting-started checklist — 3 days", "Redesign with SEO health score card as hero element"],
-},
-2: {
-    "slug":    "meta",
-    "title":   "Meta / Title Templates",
-    "verdict": "🟡 Functional but Shallow",
-    "a_summary": "Single Meta Templates page for title and description patterns. Covers all post types on one flat page.",
-    "b_summary": "14-tab panel: Global Meta, Local SEO, Social Meta, Homepage, Posts, Pages, Authors, Categories, Tags + custom post types — all controlled separately.",
-    "pm_analysis": """
-<p>Meta templates — patterns that define how titles and descriptions are generated for every page on your site — are the most frequently configured settings in any SEO plugin. Every site owner touches this. The question is whether Plugin A gives them enough control.</p>
-<p>Plugin B's 14-tab Titles and Meta panel gives separate configuration for: Global Meta (fallback), Local SEO (name, address schema), Social Meta (Facebook, Twitter defaults), Homepage, Posts, Pages, and then a tab for every custom post type and taxonomy registered on the site. This granularity matters enormously. A WooCommerce store needs different patterns for products vs. category pages. A news site needs different patterns for Articles vs. Podcasts vs. Videos. Plugin A's single page cannot handle this level of control.</p>
-<p>The Playwright test counted 0 inputs on the Meta Templates page — almost certainly a React rendering timing issue, not a missing UI. But even if all settings are present, the UX needs tabs or accordion structure clearly separating each content type. A user scrolling through a long flat page of settings for all post types gets lost quickly.</p>
-<p><strong>The job to be done:</strong> "When I configure my site's SEO, I want to set the meta title and description pattern for each content type separately so that different pages get appropriate, specific patterns rather than one generic format." Plugin A partially addresses this but the execution needs significant UX improvement.</p>
-<p><strong>Missing capabilities:</strong> No Global Meta fallback, no per-taxonomy meta control, no search results page meta, no 404 page meta, no pagination handling settings (?page=2), no date archive meta settings.</p>
-""",
-    "gaps":    ["One flat page vs 14 context-specific tabs", "No per-taxonomy meta control", "No Global Meta fallback configuration", "No pagination or date archive settings"],
-    "wins":    ["Variable system for dynamic meta titles exists", "Post-type meta patterns confirmed working"],
-    "actions": ["Add tabbed interface per content type — 1 sprint", "Add Global Meta fallback tab", "Add Homepage-specific meta configuration"],
-},
-3: {
-    "slug":    "social",
-    "title":   "Social / OG Meta",
-    "verdict": "🟡 Exists but Hidden",
-    "a_summary": "Social tab under General section. Location is non-intuitive. Default OG image configuration unclear.",
-    "b_summary": "Social Meta tab within Titles & Meta panel — same location as meta templates. OG Title ✓, Twitter Card ✓ confirmed on frontend.",
-    "pm_analysis": """
-<p>Open Graph and Twitter Card metadata directly controls how your content appears when shared on Facebook, LinkedIn, X, WhatsApp, and every other social platform. For most content businesses, the OG image is the single highest-impact visual impression their brand makes. Getting this right is critical and every SEO plugin puts it prominently.</p>
-<p>Plugin B places social settings inside the same panel as meta templates — which is the right call. Users naturally think "how this page looks to the world" as a unified concept. Plugin A splits it: meta templates live under General > Meta Templates, social settings live under General > Social. This creates a split mental model and means users frequently configure one without knowing about the other.</p>
-<p>The test showed 0 interactive elements on the Social page — this is almost certainly a React rendering issue, not a missing UI, because the build file confirms social meta code exists. But the zero count highlights a deeper problem: if automated tests can't find inputs, users on slower connections or older browsers may also have issues seeing the settings.</p>
-<p><strong>The biggest missing element:</strong> A default OG image uploader with visual preview. This is RICE item #3 at 28,000 score with XS effort. When a post has no featured image, the OG image falls back to this default. It should be the hero element of the Social settings page — a large image upload zone with a preview of how it will look in a Facebook share. If this setting exists but isn't prominent, that is a UX problem. If it doesn't exist, it must be added immediately.</p>
-""",
-    "gaps":    ["Social settings separated from meta templates — split UX", "Default OG image uploader not prominently visible", "No per-post OG image override confirmed in editor", "No per-platform preview of how content will appear"],
-    "wins":    ["Social tab exists and is accessible", "OG and Twitter meta confirmed in plugin's feature list"],
-    "actions": ["Move Social settings adjacent to Meta Templates in the navigation", "Add prominent default OG image uploader with live preview", "Test per-post OG override in Gutenberg editor sidebar"],
-},
-4: {
-    "slug":    "sitemaps",
-    "title":   "Sitemaps",
-    "verdict": "🟢 Plugin A Wins",
-    "a_summary": "sitemap.xml → 200 OK, valid XML with <urlset>. Sitemaps settings under Advanced. Works correctly out of the box.",
-    "b_summary": "sitemap_index.xml → 404 in UAT. Caused by missing rewrite flush in test environment — production likely fine.",
-    "pm_analysis": """
-<p>Sitemaps are one of the most fundamental SEO features — a list of all your URLs submitted to Google so they know what exists on your site. Plugin A wins this comparison because sitemap.xml returns 200 and valid XML, while Plugin B's sitemap_index.xml returns 404 in the test environment. To be fair, the 404 is a test environment issue caused by WordPress rewrite rules not being flushed after plugin activation in Docker — this almost certainly works on a real WordPress install. But it affected UAT confidence.</p>
-<p>Plugin A's Sitemaps page under Advanced > Sitemaps has the right controls in the right place. The issue is presentation. Users need the sitemap URL displayed prominently so they can copy it for Google Search Console submission. The URL should be at the top of the Sitemaps settings page in a text field with a one-click copy button — RICE item #5 at 13,000 score, XS effort.</p>
-<p>Code analysis revealed that Plugin A supports video sitemap and news sitemap via rewrite rules. These are advanced features that need to be surfaced clearly in settings — not buried as checkboxes. Video sitemaps can significantly improve video content indexation. News sitemaps are required for Google News publisher status. Both deserve their own sub-sections with documentation links.</p>
-<p><strong>Sitemap refresh strategy:</strong> Both plugins should auto-regenerate the sitemap when new content is published or deleted. If Plugin A is already doing this, show users a "Last regenerated: X minutes ago" timestamp. If it is not, it is a critical missing feature.</p>
-""",
-    "gaps":    ["Sitemap URL not displayed prominently with copy button", "Video sitemap and news sitemap controls not clearly visible in UAT", "Last regenerated timestamp not visible", "No post-type inclusion/exclusion controls confirmed"],
-    "wins":    ["sitemap.xml returns 200 with valid XML ✓", "Outperforms Plugin B in UAT on this specific test", "Supports video and news sitemaps in code"],
-    "actions": ["Add sitemap URL at top of settings page with copy button", "Surface video and news sitemap controls clearly", "Add last regenerated timestamp and manual regenerate button"],
-},
-5: {
-    "slug":    "schema",
-    "title":   "Schema / JSON-LD",
-    "verdict": "🟡 Baseline Good, Editor Integration Unknown",
-    "a_summary": "1 JSON-LD block on homepage: Organization, Person, WebSite. Settings under Advanced > Schema.",
-    "b_summary": "1 JSON-LD block: same types on homepage. Plugin B also offers per-post schema type selection in the Gutenberg editor.",
-    "pm_analysis": """
-<p>Schema markup is structured data in JSON-LD format that helps Google and AI systems understand what your content is about. Both plugins output the same baseline schema on the homepage: Organization, Person, and WebSite types. This is the minimum required for a credible SEO plugin, and both pass this test.</p>
-<p>However, schema is where SEO plugins differentiate significantly at the advanced level. Plugin B allows setting the schema type per post directly in the Gutenberg editor — you can mark a post as Article, Recipe, Product, HowTo, FAQ, Review, Event, LocalBusiness, or VideoObject. Each type generates the appropriate JSON-LD structure that Google uses to display rich results in search results. Rich results have measurably higher click-through rates.</p>
-<p>Whether Plugin A has per-post schema selection in the Gutenberg sidebar is unknown from this test — the Playwright test only visited the admin Schema settings page, not the post editor. This is the most important follow-up test to run. If Plugin A has per-post schema selection and it is just not documented prominently, that is a marketing problem. If it does not exist, it is a critical product gap.</p>
-<p><strong>Schema Validation:</strong> Neither plugin in this UAT showed a "validate before publish" feature. A user should be able to click "Test Schema" and see whether their JSON-LD will pass Google's rich results test — reducing the iteration cycle from "publish → wait 2 weeks" to an instant validation loop. This is a high-value differentiator for whichever plugin ships it first.</p>
-""",
-    "gaps":    ["Per-post schema type in editor — needs verification", "No schema validation / rich results preview before publish", "No FAQ or HowTo schema builder in editor", "Article schema for blog posts not confirmed"],
-    "wins":    ["Organization, Person, WebSite schema on homepage ✓", "Schema settings page exists", "Both plugins perform identically on frontend schema in UAT"],
-    "actions": ["Test per-post schema selection in Gutenberg editor immediately", "If missing, add Schema Type dropdown to editor sidebar — 1 sprint", "Add schema validation/preview feature — 1 quarter"],
-},
-6: {
-    "slug":    "redirections",
-    "title":   "Redirections",
-    "verdict": "🔴 Feature Exists — Completely Undiscoverable",
-    "a_summary": "Redirection Manager under Advanced > Redirection Manager. Feature confirmed. Add button present. Accessible via hash URL only.",
-    "b_summary": "Dedicated WordPress admin page accessible directly from the plugin's admin menu. One click from anywhere in WP admin.",
-    "pm_analysis": """
-<p>Redirections are among the most frequently used SEO maintenance tools. Every time a URL changes — a post gets renamed, a category moves, a product page is deleted — you need a 301 redirect from the old URL to the new one. Without redirects, every old inbound link and Google-indexed URL becomes a 404 error, losing all the PageRank and traffic that URL had accumulated.</p>
-<p>Plugin A has a Redirection Manager. The test confirmed it loads and has an Add button. This is genuinely good. The catastrophic problem is that nobody will ever find it. The path to reach it is: WordPress admin menu → Plugin → Content SEO → click into React SPA → click Advanced dropdown → click Redirection Manager. That is five interactions from the admin menu. Plugin B puts Redirections directly in the top-level admin submenu — one click from anywhere in the admin.</p>
-<p>This is not a feature gap. It is a discoverability catastrophe. Users who need to add a redirect will search the WordPress admin for a "Redirections" link, find nothing, assume Plugin A doesn't have it, and install a separate plugin. They then have two plugins doing the same job. Some will eventually discover the built-in version, but many won't.</p>
-<p><strong>The fix takes two hours:</strong> Add "Redirections" as a WordPress admin submenu item that links directly to the Redirection Manager hash URL inside the React SPA. RICE score is 30,000 — the second highest in the entire backlog with XS effort.</p>
-<p><strong>Feature gaps once discovered:</strong> (1) Hit counter showing how many times each redirect has been triggered. (2) Import from CSV or .htaccess for sites migrating from another plugin. (3) 404-based suggestions — "these URLs are generating 404 errors, do you want to create redirects?" This last one is what makes Plugin B's redirections tool a closed-loop SEO workflow.</p>
-""",
-    "gaps":    ["Not accessible from WordPress admin menu — buried 5 clicks deep", "No hit counter on redirections", "No CSV import / .htaccess import", "No 404-based redirect suggestions", "No regex redirect support confirmed"],
-    "wins":    ["Feature exists and loads correctly ✓", "Add redirect button confirmed present", "Hash URL navigable"],
-    "actions": ["Add WP admin submenu entry pointing to Redirections — 2 hours, RICE 30,000", "Add hit counter per redirect — 1 day", "Add CSV import — 1 sprint", "Build 404-to-redirect suggestion flow after 404 Monitor is built"],
-},
-7: {
-    "slug":    "indexing",
-    "title":   "Instant Indexing / IndexNow",
-    "verdict": "🟡 Page Exists — Connection Flow Gated",
-    "a_summary": "Settings page loads. 0 input fields detected — React component requires prior connection step before inputs appear.",
-    "b_summary": "Instant Indexing module page. API key input field visible immediately. Clear setup flow.",
-    "pm_analysis": """
-<p>IndexNow is a protocol supported by Microsoft Bing, Yandex, and others that allows websites to instantly notify search engines when content is published, updated, or deleted. The benefit is that new content gets indexed within hours instead of days or weeks. For news sites, content creators, and anyone who publishes frequently, this is a significant advantage.</p>
-<p>Plugin A has an Instant Indexing settings page. The test detected 0 input fields — likely because the React component requires a prior action (generating an API key or connecting an account) before showing the key input field. This gated UX is friction. Plugin B shows the API key input field immediately on the module page, allowing instant configuration.</p>
-<p><strong>The right UX flow for IndexNow:</strong> Step 1: Auto-generate an IndexNow API key (generate a random 32-character hex string — no user input needed). Step 2: Display the generated key with instructions. Step 3: Show a "Submit All URLs" button and a "Submission Log" of the last 50 URLs submitted with timestamps. Step 4: Toggle for "Auto-submit on publish/update." If Plugin A requires the user to do step 1 manually before anything appears, that explains the 0 inputs and represents a UX improvement opportunity.</p>
-<p><strong>Auto-submit on publish</strong> is the most important behavior. RICE score of 4,267. When a user publishes or updates a post, IndexNow submission should happen automatically in the background. This is what "instant" means in the product name. Neither plugin's auto-submit behavior was confirmed in this UAT — this needs verification for both.</p>
-""",
-    "gaps":    ["Connection flow gated — 0 inputs visible before connection", "Auto-submit on publish not confirmed", "Submission log not visible in UAT", "API key auto-generation not confirmed"],
-    "wins":    ["Settings page accessible at correct URL", "Feature is built and navigable"],
-    "actions": ["Redesign onboarding: auto-generate API key, no manual steps", "Add auto-submit toggle clearly visible on the page", "Add submission log showing last 50 URLs with timestamps", "Test and confirm auto-submit behavior on post publish"],
-},
-8: {
-    "slug":    "llms",
-    "title":   "LLMs.txt",
-    "verdict": "🔴 Flagship Feature Broken on Fresh Install",
-    "a_summary": "Settings page exists and is navigable. But /llms.txt returns 404. Feature page exists but generates no accessible file.",
-    "b_summary": "Not available. This is a Plugin A-exclusive feature — a genuine competitive moat for 2026.",
-    "pm_analysis": """
-<p>LLMs.txt is an emerging standard for communicating with AI language models about your website. Just as robots.txt tells search engine crawlers what to index, LLMs.txt tells AI systems like ChatGPT, Claude, Perplexity, and Gemini what your site is about and how your content should be represented in AI responses. As AI-powered search grows to represent 15–30% of search traffic by 2027, having control over how your content appears in AI responses will be as important as traditional SEO.</p>
-<p>Plugin A is the only plugin in this comparison with LLMs.txt support. This is a genuine competitive moat and could be Plugin A's primary marketing differentiator for 2026. The problem is that it does not work. The test navigated to /llms.txt and received a 404 error. This means the settings page exists and users can configure it, but when the file is served, WordPress returns 404.</p>
-<p>The root cause is almost certainly missing rewrite rules. WordPress needs a rewrite rule added to serve requests to /llms.txt through the plugin's handler instead of returning 404. The fix is to add rewrite rules in the plugin's activation hook or whenever LLMs.txt settings are saved — identical to how sitemap rewrite rules work. This is XS effort.</p>
-<p>The RICE score for this fix is 54,000 — the highest in the entire backlog. XS effort. Massive impact. A feature that is the product's flagship differentiator and returns a 404 on every fresh install is actively damaging trust. Any user who installs specifically for LLMs.txt and finds a 404 will immediately form a negative impression of the entire product's reliability.</p>
-<p><strong>After fixing the 404:</strong> The settings page should show a real-time preview of the generated file content, the live URL with a copy button, a "Regenerate" button, auto-population from the site's pages and posts structure, and the ability to add custom sections manually.</p>
-""",
-    "gaps":    ["LLMs.txt returns 404 — missing rewrite rules on fresh install", "No preview of generated file content in settings", "No auto-generation from site structure", "No 'view live file' link in settings", "No submission to AI crawler endpoints"],
-    "wins":    ["Settings page accessible and navigable ✓", "Only SEO plugin with this feature (massive differentiator)", "Settings architecture in place — needs routing fix only"],
-    "actions": ["Fix rewrite rules — add to activation hook — RICE 54,000, XS effort, ship this week", "Add file preview in settings page", "Add 'View live LLMs.txt' link with status indicator", "Auto-generate initial content from site pages and posts"],
-},
-9: {
-    "slug":    "tools",
-    "title":   "Status & Tools",
-    "verdict": "🔴 Missing Entirely in Plugin A",
-    "a_summary": "No Status or diagnostics page found. Import/Export tab is the only tool-oriented section.",
-    "b_summary": "Full diagnostics panel: system status, DB tools, import/export, version control. Accessible from top-level menu.",
-    "pm_analysis": """
-<p>A Status and Tools page is not glamorous. Users rarely open it. But when something goes wrong — and in WordPress, something always eventually goes wrong — the support team, the developer, and the site owner all need a place to quickly see the plugin's current state. Without a status page, every support ticket requires a back-and-forth about versions, settings, and configuration. With a status page, the user can copy and paste a system summary with one click.</p>
-<p>Plugin B's Status and Tools page includes: System Status (WP version, PHP version, plugin version, active modules list), Database Tools (recalculate SEO scores, recount redirects, clear analytics data), Import/Export (backup and restore all settings), and Version Control (rollback to previous plugin versions). This is a comprehensive tools panel that serves multiple different jobs.</p>
-<p>Plugin A has Import/Export as a tab in the main SPA. This covers one of four categories but is missing three of them. The System Status functionality is particularly important for support escalations. Without it, the support team has no efficient way to diagnose configuration issues remotely.</p>
-<p><strong>Minimum viable Status page for Plugin A:</strong> WordPress version, PHP version, plugin version, active features list (sitemap ✓, schema ✓, LLMs.txt ✓/✗, redirections ✓), last audit date, sitemap URL and status, redirect count, and a "Copy for support" button that formats all of this into a clipboard-ready text block. This is a one-sprint feature that significantly improves the support experience for both users and the support team.</p>
-""",
-    "gaps":    ["No system status / diagnostics page", "No DB tools or cache clearing", "No 'copy for support' functionality", "Import/Export isolated — not part of a tools suite"],
-    "wins":    ["Import/Export tab exists for settings backup"],
-    "actions": ["Build minimal Status page: WP version, PHP, active features, sitemap URL — 1 sprint", "Add 'Copy for support' button with formatted system info", "Add DB tools: recount redirects, clear cached schema — 1 sprint"],
-},
-}
+# ── Per-flow deep PM analysis — loaded from --flow-data JSON or empty ──────────
+FLOW_DATA = _fd.get("FLOW_DATA", {})
 
-# ── IA Recommendations ─────────────────────────────────────────────────────────
-IA_RECS = """
-<div class="ia-wrap">
-  <h3 class="ia-h">Current Navigation (Problem)</h3>
-  <div class="ia-tree">
-    <div class="ia-node ia-top">Plugin A (WP admin menu)</div>
-    <div class="ia-node ia-l1">└ Content SEO (submenu → React SPA)</div>
-    <div class="ia-node ia-l2">  ├ Dashboard (SEO Audit only)</div>
-    <div class="ia-node ia-l2">  ├ General ▾</div>
-    <div class="ia-node ia-l3">  │  ├ Meta Templates</div>
-    <div class="ia-node ia-l3">  │  ├ Social</div>
-    <div class="ia-node ia-l3">  │  ├ Home Page</div>
-    <div class="ia-node ia-l3">  │  └ Archive Pages</div>
-    <div class="ia-node ia-l2">  ├ Advanced ▾ <span class="ia-bad">← 8 unrelated features dumped here</span></div>
-    <div class="ia-node ia-l3">  │  ├ Robot Instructions</div>
-    <div class="ia-node ia-l3">  │  ├ Sitemaps</div>
-    <div class="ia-node ia-l3">  │  ├ Schema</div>
-    <div class="ia-node ia-l3">  │  ├ Robots.txt Editor</div>
-    <div class="ia-node ia-l3">  │  ├ Image SEO</div>
-    <div class="ia-node ia-l3">  │  ├ Instant Indexing</div>
-    <div class="ia-node ia-l3">  │  ├ LLMs.txt <span class="ia-bad">← flagship feature, buried</span></div>
-    <div class="ia-node ia-l3">  │  ├ Redirection Manager <span class="ia-bad">← critical feature, invisible</span></div>
-    <div class="ia-node ia-l3">  │  └ Validation</div>
-    <div class="ia-node ia-l2">  └ Import / Export</div>
-  </div>
-
-  <h3 class="ia-h" style="margin-top:24px">Recommended Navigation (Fix)</h3>
-  <div class="ia-tree">
-    <div class="ia-node ia-top">Plugin A (WP admin menu)</div>
-    <div class="ia-node ia-l1 ia-new">├ SEO Dashboard <span class="ia-tag">health score + module status</span></div>
-    <div class="ia-node ia-l1 ia-new">├ Meta &amp; Titles <span class="ia-tag">tabs per post-type + social in same panel</span></div>
-    <div class="ia-node ia-l1 ia-new">├ Sitemaps</div>
-    <div class="ia-node ia-l1 ia-new">├ Schema</div>
-    <div class="ia-node ia-l1 ia-new">├ Redirections <span class="ia-tag">WP submenu ← XS effort, RICE 30,000</span></div>
-    <div class="ia-node ia-l1 ia-new">├ LLMs.txt <span class="ia-tag">surface prominently — flagship feature</span></div>
-    <div class="ia-node ia-l1">└ Advanced (Robots, Image SEO, Indexing, Validation, Tools)</div>
-  </div>
-  <p style="font-size:12px;color:var(--mu);margin-top:12px">The rename of "Advanced" to a flat top-level structure requires zero new features. Two submenu items (Redirections + LLMs.txt) are the only code changes needed. Everything else is reorganization.</p>
-</div>
-"""
-
-# ── Feature comparison table ───────────────────────────────────────────────────
-FEATURES = [
-    ("Dashboard",           "Empty audit panel — no module status",             "Module grid + toggle switches + quick stats",              "b"),
-    ("Meta Templates",      "1 page — needs tabbed depth",                      "14 tabs — full per-post-type control",                     "b"),
-    ("Social / OG Meta",    "Exists under General (depth unclear in UAT)",       "Social Meta tab adjacent to meta templates ✓",             "b"),
-    ("XML Sitemap",         "✓ sitemap.xml → 200, valid XML",                   "✗ sitemap_index.xml → 404 in UAT (test env issue)",        "a"),
-    ("Schema / JSON-LD",    "✓ Org + Person + WebSite on homepage",             "✓ Same — per-post schema in editor (confirmed)",           "b"),
-    ("Redirections",        "✓ Exists but buried 5 clicks deep",                "✓ Top-level menu — immediately discoverable",              "b"),
-    ("404 Monitor",         "✗ Not available",                                  "✓ Dedicated admin page",                                   "b"),
-    ("Instant Indexing",    "✓ Page exists — connection flow gated",            "✓ Clear API key field on module page",                     "b"),
-    ("LLMs.txt",            "✓ Settings exist — /llms.txt returns 404",         "✗ Not available (Plugin A unique advantage)",              "a*"),
-    ("Breadcrumbs",         "✗ Not in navigation",                              "✓ Full Breadcrumbs tab in General Settings",               "b"),
-    ("Robots.txt Editor",   "✓ Advanced → Robots.txt Editor",                  "✓ General Settings → robots.txt tab",                     "none"),
-    ("Image SEO",           "✓ Advanced → Image SEO",                          "✓ Within Titles & Meta",                                  "none"),
-    ("Status & Diagnostics","✗ Import/Export only",                             "✓ Full panel: system status + DB tools",                   "b"),
-    ("Onboarding",          "✗ None",                                           "✓ Setup wizard",                                          "b"),
-    ("Import / Export",     "✓ Dedicated tab",                                  "✓ Via Status & Tools",                                    "none"),
-]
-a_wins = sum(1 for r in FEATURES if r[3] in ("a", "a*", "none"))
-b_wins = sum(1 for r in FEATURES if r[3] == "b")
+# ── IA Recommendations + Feature table — loaded from --flow-data JSON or empty ──
+IA_RECS  = _fd.get("IA_RECS", "")
+FEATURES = _fd.get("FEATURES", [])
+a_wins = sum(1 for r in FEATURES if r[3] in ("a", "a*", "none")) if FEATURES else 0
+b_wins = sum(1 for r in FEATURES if r[3] == "b") if FEATURES else 0
 
 # ── HTML builders ──────────────────────────────────────────────────────────────
 def rice_row(f):

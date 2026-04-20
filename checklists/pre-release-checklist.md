@@ -62,7 +62,7 @@
 
 - [ ] Branch: `release/vX.Y.Z` (never push directly to main)
 - [ ] GitHub Actions: all checks green
-- [ ] Plugin zip: root folder is correct name (e.g. `the-plus-addons-for-elementor/`)
+- [ ] Plugin zip: root folder matches the plugin slug (e.g. `your-plugin-slug/`)
 - [ ] Zip tested: fresh install → activate → spot-check
 - [ ] Release notes written (non-technical, user-focused)
 

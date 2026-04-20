@@ -23,7 +23,7 @@
     {
       "step": "setSiteOptions",
       "options": {
-        "blogname": "Plugin QA Test Site",
+        "blogname": "Orbit QA Test Site",
         "blogdescription": "Automated QA testing environment"
       }
     },

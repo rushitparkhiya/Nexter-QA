@@ -475,7 +475,7 @@ echo "  HTML report:  $(pwd)/reports/playwright-html/index.html"
 echo "  Screenshots:  $(pwd)/reports/screenshots/"
 echo "  Videos:       $(pwd)/reports/videos/"
 [ -d "reports/skill-audits" ] && echo "  Skill audits: $(pwd)/reports/skill-audits/"
-[ -f "reports/NEXTER-VS-RANKMATH-UAT.html" ] && echo "  Compare UAT:  $(pwd)/reports/NEXTER-VS-RANKMATH-UAT.html"
+for f in reports/uat-report-*.html; do [ -f "$f" ] && echo "  UAT report:   $(pwd)/$f"; done
 echo ""
 echo -e "${CYAN}Open HTML report:${NC}  npx playwright show-report reports/playwright-html"
 echo -e "${CYAN}Open skill audits:${NC} open reports/skill-audits/"

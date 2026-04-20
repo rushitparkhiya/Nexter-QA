@@ -13,6 +13,9 @@
  *    response and throws on redirect-to-login or PHP fatal.
  */
 
+const path = require('path');
+const fs   = require('fs');
+
 const ADMIN_BASE = process.env.WP_TEST_URL
   ? `${process.env.WP_TEST_URL}/wp-admin`
   : 'http://localhost:8881/wp-admin';
@@ -77,7 +80,8 @@ async function gotoAdmin(page, slug, hashOrQuery = '') {
   const url = `${ADMIN_BASE}/admin.php?page=${slug}${hashOrQuery}`;
   await page.goto(url);
   await page.waitForLoadState('domcontentloaded');
-  await page.waitForTimeout(2500); // React SPAs need time to mount
+  await page.waitForLoadState('networkidle').catch(() => {});
+  await page.waitForTimeout(800); // fallback buffer for React mount
   await assertPageReady(page, `gotoAdmin(${slug})`);
 }
 
@@ -166,8 +170,6 @@ async function countElements(page, selector) {
 //   side    : 'a' = plugin under test (left), 'b' = competitor (right)
 //   extra   : optional suffix for multiple shots in same flow (scroll, modal, form)
 
-const path = require('path');
-const fs   = require('fs');
 
 async function snapPair(page, pairNum, slug, side, snapDir, extra = '') {
   fs.mkdirSync(snapDir, { recursive: true });
