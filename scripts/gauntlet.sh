@@ -422,6 +422,18 @@ echo ""
 echo "================================="
 echo -e "${BOLD}Results${NC}: ${GREEN}$PASS passed${NC} | ${YELLOW}$WARN warnings${NC} | ${RED}$FAIL failed${NC}"
 echo ""
+# Auto-generate UAT HTML report if flow screenshots exist
+if [ -d "reports/screenshots/flows-compare" ] && ls reports/screenshots/flows-compare/*.png &>/dev/null; then
+  UAT_HTML="reports/uat-compare-$TIMESTAMP.html"
+  python3 scripts/generate-uat-report.py \
+    --title "UAT Flow Report — $(date +%Y-%m-%d)" \
+    --out "$UAT_HTML" \
+    --snaps "reports/screenshots/flows-compare" \
+    --videos "reports/videos" 2>/dev/null && {
+    ok "UAT HTML report generated: $UAT_HTML"
+  } || true
+fi
+
 echo -e "${BOLD}Reports generated:${NC}"
 echo "  MD report:    $(pwd)/$REPORT_FILE"
 echo "  HTML report:  $(pwd)/reports/playwright-html/index.html"
