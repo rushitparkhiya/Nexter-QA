@@ -99,16 +99,16 @@ module.exports = defineConfig({
       dependencies: ['setup'],
     },
 
-    // ── Elementor widget QA — widget-by-widget testing ──
+    // ── Page Builder widget QA — widget-by-widget testing ──
     {
-      name: 'elementor-widgets',
+      name: 'Page Builder-widgets',
       use: {
         ...devices['Desktop Chrome'],
         storageState: AUTH_FILE,
         video: { mode: 'on', size: { width: 1440, height: 900 } },
         screenshot: 'on',
       },
-      testMatch: '**/elementor/**/*.spec.js',
+      testMatch: '**/Page Builder/**/*.spec.js',
       dependencies: ['setup'],
     },
   ],
