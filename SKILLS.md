@@ -1,10 +1,10 @@
-# Skill Commands for PlugOrbit
+# Skill Commands for Orbit
 
-> Every QA task in PlugOrbit maps to a Claude Code skill. This file is the complete reference — what to type, when to use it, what it does.
+> Every QA task in Orbit maps to a Claude Code skill. This file is the complete reference — what to type, when to use it, what it does.
 
 ## Attribution
 
-PlugOrbit integrates with skills from three open-source repositories. You don't need Google Antigravity installed — these all work directly inside Claude Code once you have them locally.
+Orbit integrates with skills from three open-source repositories. You don't need Google Antigravity installed — these all work directly inside Claude Code once you have them locally.
 
 | Repo | What It Ships | Link |
 |---|---|---|
@@ -36,13 +36,13 @@ After install, every skill is invokable with `/skill-name` inside Claude Code. *
 # From your plugin directory
 claude "/skill-name Do X for this plugin"
 
-# Or from PlugOrbit root, pointing at your plugin
+# Or from Orbit root, pointing at your plugin
 claude "/skill-name Review /path/to/my-plugin for WordPress coding standards"
 ```
 
 ---
 
-## Core PlugOrbit Skills — Quick Reference
+## Core Orbit Skills — Quick Reference
 
 ### WordPress-Specific (must-install)
 
@@ -430,4 +430,4 @@ Browse the full catalogs:
 
 Browse the live site: [sickn33.github.io/antigravity-awesome-skills](https://sickn33.github.io/antigravity-awesome-skills/)
 
-Install any skill, then add its `/slash-command` to PlugOrbit's workflow. Contributions welcome — open a PR in this repo.
+Install any skill, then add its `/slash-command` to Orbit's workflow. Contributions welcome — open a PR in this repo.

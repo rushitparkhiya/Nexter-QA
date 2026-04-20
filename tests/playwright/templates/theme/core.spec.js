@@ -1,4 +1,4 @@
-// PlugOrbit — WordPress Theme Test Template
+// Orbit — WordPress Theme Test Template
 // Tests: activation, customizer, block templates, FSE, frontend smoke
 const { test, expect } = require('@playwright/test');
 

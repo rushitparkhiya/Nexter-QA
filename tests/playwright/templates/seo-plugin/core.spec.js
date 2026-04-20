@@ -1,4 +1,4 @@
-// PlugOrbit — SEO Plugin Test Template
+// Orbit — SEO Plugin Test Template
 // Tests: meta tags output, sitemap, schema injection, admin UI
 const { test, expect } = require('@playwright/test');
 

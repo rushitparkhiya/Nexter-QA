@@ -1,6 +1,6 @@
 # Power Tools — Make Every Claude Code Session Smarter
 
-PlugOrbit works on vanilla tooling, but these power-ups turn it into a senior-team-grade QA station. Install everything with:
+Orbit works on vanilla tooling, but these power-ups turn it into a senior-team-grade QA station. Install everything with:
 
 ```bash
 bash scripts/install-power-tools.sh

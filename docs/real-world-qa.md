@@ -9,7 +9,7 @@
 ### What breaks
 User uninstalls your plugin → database still has `wp_options` rows, custom tables, cron jobs, transients. Over time, a WP site accumulates gigabytes of orphaned plugin data.
 
-### How PlugOrbit catches it
+### How Orbit catches it
 
 ```bash
 # Inside wp-env
@@ -66,7 +66,7 @@ Audit my plugin's uninstall cleanup. Verify uninstall.php removes: options, post
 ### What breaks
 User has v1.0 installed, upgrades to v2.0. Your new code assumes a DB schema that v1.0 didn't have. Site white-screens.
 
-### How PlugOrbit catches it
+### How Orbit catches it
 
 ```bash
 # 1. Install old version
@@ -107,7 +107,7 @@ Plugin works fine on single WP. On multisite, a super-admin activates network-wi
 - Writes to `wp_options` of site 1 only, breaks sites 2..N
 - Has admin pages that don't check `is_network_admin()`
 
-### How PlugOrbit catches it
+### How Orbit catches it
 
 Create a multisite test site:
 
@@ -139,7 +139,7 @@ Audit my plugin for multisite compatibility:
 ### What breaks
 Your plugin works alone. User activates it alongside WooCommerce / Elementor / Yoast / WPML → crashes.
 
-### How PlugOrbit catches it
+### How Orbit catches it
 
 Extend `.wp-env.json` with top conflicters:
 
@@ -170,7 +170,7 @@ Check: hook priority clashes, class name collisions, enqueue handle conflicts, f
 ### What breaks
 Local passes. Staging fails because of: HTTPS redirect rules, CDN caching, server-level rewrite issues, different PHP version than local.
 
-### How PlugOrbit handles it
+### How Orbit handles it
 
 ```bash
 # Point Playwright at your staging URL (requires auth cookie or basic auth)
@@ -202,7 +202,7 @@ use: {
 ### What breaks
 Your plugin ships with English. French user installs the `.po` file → half the strings still show in English because you forgot `__()` wrappers.
 
-### How PlugOrbit catches it
+### How Orbit catches it
 
 Gauntlet Step 5 (i18n/POT) already does:
 ```bash
@@ -245,7 +245,7 @@ Audit i18n in my plugin:
 ### What breaks
 Plugin schedules `my_plugin_daily`. Works fine in dev. User's site has `DISABLE_WP_CRON` set → your cron never fires → feature looks broken.
 
-### How PlugOrbit catches it
+### How Orbit catches it
 
 ```bash
 # List scheduled events
@@ -308,7 +308,7 @@ Audit GDPR compliance for my plugin:
 ### What breaks
 Public REST endpoint lets anyone read admin-only data. Critical security bug.
 
-### How PlugOrbit catches it
+### How Orbit catches it
 
 ```bash
 # Discover all REST routes added by your plugin
@@ -369,7 +369,7 @@ Review file upload handling in my plugin:
 ### What breaks
 Plugin works for 10 posts. User has 10,000 posts → queries time out, site dies.
 
-### How PlugOrbit catches it
+### How Orbit catches it
 
 ```bash
 # Seed wp-env with 10,000 posts
@@ -395,7 +395,7 @@ bash scripts/editor-perf.sh
 ### What breaks
 Tests pass on Chrome. Safari / Firefox / Edge users report issues.
 
-### PlugOrbit's approach
+### Orbit's approach
 
 Playwright runs cross-browser out of the box. Add projects to `playwright.config.js`:
 
@@ -419,7 +419,7 @@ npx playwright test --project=firefox --project=webkit
 ### What breaks
 Plugin assumes the API is always reachable. User's on flaky WiFi → indefinite spinner or white screen.
 
-### How PlugOrbit tests
+### How Orbit tests
 
 ```js
 test('gracefully handles API timeout', async ({ page, context }) => {
@@ -444,7 +444,7 @@ test('works offline for cached pages', async ({ page, context }) => {
 ### What breaks
 Users with `WP_DEBUG=true` + log viewers see 100 lines of PHP warnings from your plugin → reputation damage.
 
-### PlugOrbit enforces this
+### Orbit enforces this
 
 `.wp-env.json` has `WP_DEBUG: true, WP_DEBUG_LOG: true`. After a gauntlet run:
 
@@ -468,7 +468,7 @@ MY_NOISE=$(echo "$DEBUG_LOG" | grep -c "my-plugin")
 ### What breaks
 You ship v2.0 with new CSS. Users still see v1.0 CSS because the URL didn't change. Layout broken.
 
-### How PlugOrbit catches it
+### How Orbit catches it
 
 ```bash
 # Before + after — compare CSS URLs
@@ -530,7 +530,7 @@ What breaks after release that tests couldn't predict:
 - Theme conflict you never saw
 - Scale issue (100k posts, 10k users)
 
-### PlugOrbit's post-release helpers
+### Orbit's post-release helpers
 
 ```bash
 # Quick compat check on user's reported env

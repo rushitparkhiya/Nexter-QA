@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PlugOrbit — Database Query Profiler via wp-env
+# Orbit — Database Query Profiler via wp-env
 # Requires: wp-env site running, Query Monitor plugin active (auto-installed by create-test-site.sh)
 # Usage:
 #   bash scripts/db-profile.sh
@@ -22,7 +22,7 @@ mkdir -p reports
 GREEN='\033[0;32m'; YELLOW='\033[1;33m'; RED='\033[0;31m'; BOLD='\033[1m'; NC='\033[0m'
 
 echo ""
-echo -e "${BOLD}PlugOrbit Database Query Profiler${NC}"
+echo -e "${BOLD}Orbit Database Query Profiler${NC}"
 echo "URL: $WP_URL"
 echo "========================================" | tee "$REPORT"
 

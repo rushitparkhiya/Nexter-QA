@@ -1,6 +1,6 @@
 # Deep Performance — Beyond Lighthouse
 
-Lighthouse scores the final rendered page. PlugOrbit goes deeper — into your **backend hooks**, **frontend bundle waste**, and the **editor experience** (Elementor, Gutenberg). Lighthouse says "your page is slow." These tools tell you **which line of code is slow**.
+Lighthouse scores the final rendered page. Orbit goes deeper — into your **backend hooks**, **frontend bundle waste**, and the **editor experience** (Elementor, Gutenberg). Lighthouse says "your page is slow." These tools tell you **which line of code is slow**.
 
 ---
 
@@ -57,7 +57,7 @@ wp-env run cli bash -c 'cp /tmp/cachegrind.out.* /wordpress/wp-content/trace.out
 qcachegrind trace.out
 ```
 
-### PlugOrbit Skill Prompt
+### Orbit Skill Prompt
 
 ```
 /performance-engineer
@@ -102,7 +102,7 @@ purgecss \
 
 ### Coverage Tool (Chrome DevTools API)
 
-PlugOrbit wires this via Playwright:
+Orbit wires this via Playwright:
 
 ```js
 // Already in tests/playwright/templates/
@@ -130,7 +130,7 @@ const longTasks = await page.evaluate(() => new Promise(resolve => {
 // Flag any task >200ms
 ```
 
-### PlugOrbit Skill Prompt
+### Orbit Skill Prompt
 
 ```
 /frontend-design
@@ -190,7 +190,7 @@ This Playwright harness:
 
 Any `insertMs > 800` or `memoryMB > 30` per widget is a red flag.
 
-### PlugOrbit Skill Prompt
+### Orbit Skill Prompt
 
 ```
 /performance-engineer
@@ -231,7 +231,7 @@ const insertMs = performance.now() - start;
 
 Use React DevTools Profiler inside the editor — record a session inserting 10 blocks → exports a flame graph showing which of your components re-render too often.
 
-### PlugOrbit Skill Prompt
+### Orbit Skill Prompt
 
 ```
 /performance-engineer

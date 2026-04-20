@@ -1,5 +1,5 @@
 /**
- * PlugOrbit — UI Audit Tests
+ * Orbit — UI Audit Tests
  * Generic checks that catch bad UI regardless of plugin type.
  * Works for any WordPress plugin — reads admin pages from qa.config.json.
  *

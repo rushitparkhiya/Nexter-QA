@@ -1,10 +1,10 @@
-# PlugOrbit — Getting Started
+# Orbit — Getting Started
 
 > From zero to running a full plugin QA gauntlet in 15 minutes. Every step is a copy-paste command.
 
 ---
 
-## Why PlugOrbit Chooses wp-env (Docker) Over Local WP
+## Why Orbit Chooses wp-env (Docker) Over Local WP
 
 Before you spend time setting up, here's the honest reasoning:
 
@@ -13,7 +13,7 @@ Before you spend time setting up, here's the honest reasoning:
 - Snapshots are manual (click → save → click → restore)
 - Can't script "create 5 sites on 5 PHP versions in parallel"
 - Great for manual QA, bad for automation
-- We removed it from PlugOrbit because **any** manual click is incompatible with "mass scale, no-brain testing"
+- We removed it from Orbit because **any** manual click is incompatible with "mass scale, no-brain testing"
 
 ### wp-now (PHP-WASM + SQLite)
 - Zero setup, instant start
@@ -22,7 +22,7 @@ Before you spend time setting up, here's the honest reasoning:
 - Lighthouse numbers skewed by WASM overhead
 - Fine for smoke tests. Dangerous for release decisions.
 
-### wp-env (Docker + MariaDB) ← PlugOrbit's choice
+### wp-env (Docker + MariaDB) ← Orbit's choice
 - **Real MariaDB** — identical to production MySQL for queries, indexes, slow logs, `performance_schema`
 - **Real PHP** — 7.4 / 8.0 / 8.1 / 8.2 / 8.3 on demand
 - **Real WordPress** — what your users actually run
@@ -44,7 +44,7 @@ If that one-time install is acceptable, wp-env is the right answer for serious Q
 
 ```bash
 # 1. One-time setup (15 min total, mostly downloads)
-git clone https://github.com/adityaarsharma/plugorbit && cd plugorbit
+git clone https://github.com/adityaarsharma/orbit && cd orbit
 bash setup/init.sh                       # interactive config
 bash scripts/install-power-tools.sh      # all CLIs
 
@@ -82,7 +82,7 @@ That's it. Everything below is context and troubleshooting.
 
 - One-time install (~1GB download, 5 min)
 - Launch Docker Desktop **once** — it runs in the background after
-- **You never open the Docker GUI again** — everything is CLI from PlugOrbit
+- **You never open the Docker GUI again** — everything is CLI from Orbit
 - Docker Desktop auto-starts on login (optional, in Docker Settings)
 
 ### Verify Prerequisites
@@ -99,12 +99,12 @@ If any are missing, install them before continuing.
 
 ---
 
-## Step 2 — Clone PlugOrbit
+## Step 2 — Clone Orbit
 
 ```bash
 cd ~              # or wherever you keep projects
-git clone https://github.com/adityaarsharma/plugorbit
-cd plugorbit
+git clone https://github.com/adityaarsharma/orbit
+cd orbit
 ```
 
 ---
@@ -162,7 +162,7 @@ bash scripts/create-test-site.sh --plugin ~/plugins/my-plugin --port 8881
 ```
 
 What happens:
-1. PlugOrbit writes `.wp-env-site/default/.wp-env.json`
+1. Orbit writes `.wp-env-site/default/.wp-env.json`
 2. `wp-env start` pulls WordPress + MariaDB Docker images (first time: ~2 min)
 3. Your plugin mounts as a bind-mount — **edits in your plugin source reflect instantly**
 4. Query Monitor auto-installs
@@ -184,7 +184,7 @@ wp-env destroy      # nuke entirely
 ### Run Any WP-CLI Command
 
 ```bash
-# From PlugOrbit root
+# From Orbit root
 (cd .wp-env-site/default && wp-env run cli wp plugin list)
 (cd .wp-env-site/default && wp-env run cli wp user list)
 (cd .wp-env-site/default && wp-env run cli wp db query "SELECT * FROM wp_options LIMIT 5")
@@ -399,7 +399,7 @@ docker stop $(docker ps -q --filter "name=wordpress") 2>/dev/null
 
 ---
 
-## How PlugOrbit Protects Your Tokens (Claude Code)
+## How Orbit Protects Your Tokens (Claude Code)
 
 - Reports are **short by default** — tables, not prose
 - Playwright tests output minimal JSON, not verbose HTML
@@ -409,7 +409,7 @@ docker stop $(docker ps -q --filter "name=wordpress") 2>/dev/null
 
 ---
 
-## How PlugOrbit Protects Your PC from Melting
+## How Orbit Protects Your PC from Melting
 
 - **Concurrency auto-capped** at half your CPU cores (max 4) in batch mode
 - wp-env sites are **stopped after gauntlet** completes (auto-cleanup in batch-test.sh)

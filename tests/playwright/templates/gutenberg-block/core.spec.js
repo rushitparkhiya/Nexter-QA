@@ -1,4 +1,4 @@
-// PlugOrbit — Gutenberg Block Plugin Test Template
+// Orbit — Gutenberg Block Plugin Test Template
 // Tests: block inserter discovery, save+reload, block.json validity, frontend render
 const { test, expect } = require('@playwright/test');
 

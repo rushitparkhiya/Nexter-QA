@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PlugOrbit — Smart test site creator
+# Orbit — Smart test site creator
 # Auto-picks the right backend based on what the user is doing:
 #
 #   --mode quick    → wp-now    (10s startup, SQLite, ideal for rapid smoke tests)

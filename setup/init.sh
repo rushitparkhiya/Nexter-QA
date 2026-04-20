@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PlugOrbit — Interactive First-Run Setup
+# Orbit — Interactive First-Run Setup
 # Creates qa.config.json tailored to your plugin type
 # Usage: bash setup/init.sh
 

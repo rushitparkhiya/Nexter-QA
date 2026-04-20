@@ -1,4 +1,4 @@
-// PlugOrbit — WooCommerce Extension Test Template
+// Orbit — WooCommerce Extension Test Template
 // Tests: shop/cart/checkout render, WC hooks compat, no conflicts
 const { test, expect } = require('@playwright/test');
 

@@ -1,12 +1,12 @@
 # wp-env / wp-now Setup Guide
 
-PlugOrbit uses **fully automated** WordPress test sites — no GUI apps, no click-through setup.
+Orbit uses **fully automated** WordPress test sites — no GUI apps, no click-through setup.
 
 ## Two Tools, Two Use Cases
 
 | Tool | Backed By | Best For |
 |---|---|---|
-| `@wordpress/env` | Docker | Full PlugOrbit gauntlet, CI parity, multi-version matrix |
+| `@wordpress/env` | Docker | Full Orbit gauntlet, CI parity, multi-version matrix |
 | `wp-now` | PHP WASM | Instant single-plugin sanity checks, no Docker |
 
 Install both with the power tools script:
@@ -36,7 +36,7 @@ npm install -g @wordpress/env @wp-now/wp-now
 
 ## Quick Start
 
-### Option 1 — PlugOrbit wrapper (recommended)
+### Option 1 — Orbit wrapper (recommended)
 
 ```bash
 bash scripts/create-test-site.sh --plugin ~/plugins/my-plugin --port 8881
@@ -191,7 +191,7 @@ wp-env run cli bash        # shell into the container
 
 | Need | Use |
 |---|---|
-| Full PlugOrbit gauntlet | `wp-env` via `create-test-site.sh` |
+| Full Orbit gauntlet | `wp-env` via `create-test-site.sh` |
 | Quick 30-second sanity check | `wp-now` |
 | DB profiling / query monitoring | `wp-env` (has MySQL container) |
 | Multi-version matrix | `wp-env` (one config per combo) |

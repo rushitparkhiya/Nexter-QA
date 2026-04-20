@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PlugOrbit — Full Pre-Release Gauntlet
+# Orbit — Full Pre-Release Gauntlet
 # Usage: bash scripts/gauntlet.sh --plugin /path/to/plugin [--env local|ci] [--mode full|quick]
 #
 # macOS note: if you see "colors not working", run: export TERM=xterm-256color
@@ -43,7 +43,7 @@ PLUGIN_NAME=$(basename "$PLUGIN_PATH")
 
 # Init report
 cat > "$REPORT_FILE" << EOF
-# PlugOrbit Gauntlet Report
+# Orbit Gauntlet Report
 **Plugin**: $PLUGIN_NAME
 **Date**: $(date)
 **Mode**: $MODE / $ENV
@@ -54,7 +54,7 @@ cat > "$REPORT_FILE" << EOF
 EOF
 
 echo ""
-echo -e "${BOLD}PlugOrbit — Pre-Release Gauntlet${NC}"
+echo -e "${BOLD}Orbit — Pre-Release Gauntlet${NC}"
 echo -e "Plugin: ${YELLOW}$PLUGIN_NAME${NC} | Mode: $MODE | Env: $ENV"
 echo "================================================"
 
@@ -159,13 +159,13 @@ header "Step 5: i18n / POT File"
 log "## Step 5: i18n / POT"
 
 if command -v wp &>/dev/null; then
-  POT_OUT=$(cd "$PLUGIN_PATH" && wp i18n make-pot . /tmp/plugorbit-check.pot --skip-audit 2>&1 || true)
+  POT_OUT=$(cd "$PLUGIN_PATH" && wp i18n make-pot . /tmp/orbit-check.pot --skip-audit 2>&1 || true)
   UNWRAPPED=$(grep -rE "echo\s+['\"]" "$PLUGIN_PATH" --include="*.php" \
     --exclude-dir=vendor --exclude-dir=node_modules 2>/dev/null \
     | grep -vE "(__\(|_e\(|esc_html__|esc_attr__|_x\(|_n\()" | wc -l | tr -d ' ')
 
-  if [ -f "/tmp/plugorbit-check.pot" ]; then
-    STRINGS=$(grep -c '^msgid "' /tmp/plugorbit-check.pot || echo "0")
+  if [ -f "/tmp/orbit-check.pot" ]; then
+    STRINGS=$(grep -c '^msgid "' /tmp/orbit-check.pot || echo "0")
     ok "POT generated — $STRINGS translatable strings"
     log "- ✓ POT generated: $STRINGS strings"
     if [ "$UNWRAPPED" -gt 0 ]; then
@@ -175,7 +175,7 @@ if command -v wp &>/dev/null; then
     else
       ((PASS++))
     fi
-    rm -f /tmp/plugorbit-check.pot
+    rm -f /tmp/orbit-check.pot
   else
     warn "POT generation failed — check plugin header + text domain"
     log "- ⚠ POT generation failed"

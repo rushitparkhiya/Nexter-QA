@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PlugOrbit — Batch parallel testing
+# Orbit — Batch parallel testing
 # Runs gauntlet on N plugins simultaneously, CPU-throttled, streaming output.
 # Each plugin gets its own wp-env site on a separate port.
 #
@@ -54,7 +54,7 @@ BATCH_REPORT="reports/batch-$TIMESTAMP.md"
 mkdir -p reports reports/batch-logs
 
 echo ""
-echo -e "${BOLD}PlugOrbit Batch Gauntlet${NC}"
+echo -e "${BOLD}Orbit Batch Gauntlet${NC}"
 echo "  Plugins:      $TOTAL"
 echo "  Concurrency:  $CONCURRENCY  (auto-scaled to half CPU cores, capped at 4)"
 echo "  Base port:    $BASE_PORT"
@@ -62,7 +62,7 @@ echo "  Report:       $BATCH_REPORT"
 echo "================================================="
 
 cat > "$BATCH_REPORT" <<EOF
-# PlugOrbit Batch Report
+# Orbit Batch Report
 **Date**: $(date)
 **Plugins**: $TOTAL
 **Concurrency**: $CONCURRENCY

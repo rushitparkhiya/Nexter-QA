@@ -1,4 +1,4 @@
-// PlugOrbit — Elementor Addon Test Template
+// Orbit — Elementor Addon Test Template
 // Tests: widget panel discovery, editor render, frontend output, responsive
 const { test, expect } = require('@playwright/test');
 

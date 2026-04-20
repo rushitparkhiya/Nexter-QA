@@ -1,5 +1,5 @@
 /**
- * PlugOrbit — Visual Snapshot Tests
+ * Orbit — Visual Snapshot Tests
  * Takes screenshots of every meaningful plugin UI screen and compares against baselines.
  *
  * First run:  npx playwright test tests/playwright/visual/ --update-snapshots

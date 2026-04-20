@@ -1,4 +1,4 @@
-// PlugOrbit — Generic WordPress Plugin Test Template
+// Orbit — Generic WordPress Plugin Test Template
 // Copy this file, replace PLUGIN_SLUG and selectors with your plugin's specifics.
 //
 // Usage:

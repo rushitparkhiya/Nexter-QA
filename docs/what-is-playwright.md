@@ -1,4 +1,4 @@
-# What Is Playwright — And Why PlugOrbit Uses It
+# What Is Playwright — And Why Orbit Uses It
 
 > A beginner-friendly explanation for anyone new to browser automation.
 
@@ -126,7 +126,7 @@ Plain English:
 
 ---
 
-## What Gets Tested Automatically in PlugOrbit
+## What Gets Tested Automatically in Orbit
 
 Every template in `tests/playwright/templates/` checks:
 
@@ -185,7 +185,7 @@ Perfect for "this failed on CI but works locally" debugging — the trace has al
 
 ---
 
-## How PlugOrbit Avoids Re-Login Spam
+## How Orbit Avoids Re-Login Spam
 
 Without smart setup, every test would do this:
 
@@ -202,7 +202,7 @@ test('foo', async ({ page }) => {
 
 100 tests × 3-second login = 5 minutes wasted per run.
 
-**PlugOrbit's approach** — Playwright's `storageState`:
+**Orbit's approach** — Playwright's `storageState`:
 
 1. `tests/playwright/auth.setup.js` logs in **ONCE** and saves cookies to `.auth/wp-admin.json`
 2. `playwright.config.js` declares every other project `dependencies: ['setup']`
@@ -236,7 +236,7 @@ Be honest about limits:
 - **Won't catch bugs in code paths no test touches** — coverage gaps exist
 - **Tests can lie** — a poorly written test can pass even when the feature is broken
 
-That's why PlugOrbit combines Playwright (behavior) + PHPCS (code) + PHPStan (types) + Lighthouse (perf) + manual checklists (judgment). No single tool is sufficient.
+That's why Orbit combines Playwright (behavior) + PHPCS (code) + PHPStan (types) + Lighthouse (perf) + manual checklists (judgment). No single tool is sufficient.
 
 ---
 

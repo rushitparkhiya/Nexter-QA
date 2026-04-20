@@ -1,10 +1,10 @@
 <div align="center">
 
-# 🪐 PlugOrbit
+# 🪐 Orbit
 
-### **WordPress Plugin QA Intelligence**
+### **Complete UAT for WordPress Plugins**
 
-*The automated QA pipeline that makes every WordPress plugin ship like it was built by a senior team — even when it wasn't.*
+*Every perspective. Every release. Dev → QA → PM → Designer → End User.*
 
 **👉 [Start Here: Getting Started Guide](GETTING-STARTED.md) — 15 min to first run**
 
@@ -18,7 +18,7 @@
 
 <br />
 
-**👨‍💻 Developers** → zero-regression releases &nbsp;·&nbsp; **🧪 QA Teams** → structured testing &nbsp;·&nbsp; **📊 Product Managers** → shipping confidence
+**👨‍💻 Dev** → zero-regression releases &nbsp;·&nbsp; **🧪 QA** → structured test coverage &nbsp;·&nbsp; **📊 PM** → flow maps + complexity scores &nbsp;·&nbsp; **🎨 Designer** → visual diffs + UI audits &nbsp;·&nbsp; **👤 End User** → real browser, real flows
 
 Covers **Elementor Addons · Gutenberg Blocks · SEO Plugins · WooCommerce Extensions · Themes**
 
@@ -32,7 +32,9 @@ Covers **Elementor Addons · Gutenberg Blocks · SEO Plugins · WooCommerce Exte
 
 ## The Pitch — What This Actually Is
 
-**PlugOrbit is a QA operating system for WordPress plugins.** One command and you get:
+**Orbit is a UAT platform for WordPress plugins.** Not just code checks — every angle a plugin gets judged from before users touch it: code quality, visual correctness, UX flow depth, PM-level complexity scoring, responsive behavior, and real competitor context.
+
+One command and you get:
 
 - ✅ Real WordPress + real MySQL running in Docker (fully scripted, no GUI clicks)
 - ✅ PHP lint + WordPress Coding Standards + VIP + PHPStan (catches bugs before they run)
@@ -41,10 +43,12 @@ Covers **Elementor Addons · Gutenberg Blocks · SEO Plugins · WooCommerce Exte
 - ✅ DB query profiling with Query Monitor + `performance_schema` (catches N+1s)
 - ✅ Competitor analysis from wordpress.org (catches when you fall behind)
 - ✅ Claude Code skill integration — 30+ `/slash` commands for AI-assisted audit (catches what humans miss)
+- ✅ PM flow mapping — click-depth, wizard detection, complexity scoring per feature vs competitors
+- ✅ Designer layer — pixel-diff visual regression across admin, editor, and frontend at every viewport
 - ✅ Mass parallel mode — test 5 plugins at once on your own Mac, CPU-throttled
-- ✅ Zero POSIMYTH-specific hardcoding — works for any WP plugin type (Elementor, Gutenberg, SEO, Woo, theme)
+- ✅ Zero hardcoding — works for any WP plugin type (Elementor, Gutenberg, SEO, WooCommerce, themes)
 
-**The outcome**: plugins ship with the discipline of a senior team, even when written by a single developer.
+**The outcome**: every release goes through the same scrutiny as if a Dev, QA engineer, PM, Designer, and beta tester all signed off — automated.
 
 Built and maintained by [@adityaarsharma](https://github.com/adityaarsharma). Works with any Claude Code-enabled machine.
 
@@ -52,13 +56,15 @@ Built and maintained by [@adityaarsharma](https://github.com/adityaarsharma). Wo
 
 ## Why This Exists
 
-Most WordPress plugin bugs that reach users fall into three categories:
+Most WordPress plugin issues that reach users fall into five categories:
 
 1. **Code that was never wrong, just untested** — a widget that renders fine on the dev's machine breaks on PHP 8.2
 2. **Performance regressions nobody noticed** — a new feature adds 40 extra DB queries per page load
 3. **Design debt** — settings UI that confuses users because it was built dev-first, not user-first
+4. **Flow blindness** — nobody mapped whether a first-time user can actually complete setup without a tutorial
+5. **No comparison baseline** — "our Mega Menu is better than ElementKit" stated without any data
 
-This pipeline catches all three, automatically, before any release ships.
+UAT (User Acceptance Testing) is the practice of validating a product from every perspective before it ships — not just "does the code run" but "will a real user get stuck, is the UI regressed, does the PM have evidence it's better than competitors." Orbit automates that entire layer for WordPress plugins.
 
 **What top teams do that most don't**:
 - Automattic/WordPress VIP run every commit through PHP linting + VIP coding standards before merge
@@ -66,7 +72,7 @@ This pipeline catches all three, automatically, before any release ships.
 - WordPress.org plugin team added 15+ automated security checks in 2025 alone
 - Leading Elementor addon teams run Playwright E2E suites across 3 WP versions before release
 
-PlugOrbit brings that same discipline to any plugin team, with a single command.
+Orbit brings that same discipline to any plugin team, with a single command.
 
 ---
 
@@ -96,6 +102,16 @@ PlugOrbit brings that same discipline to any plugin team, with a single command.
 | **Console Errors** | JS errors specific to your plugin | Playwright | 1min |
 | **Changelog Testing** | Maps each changelog entry to targeted test | `changelog-test.sh` | 1min |
 
+### For Designers
+
+| Layer | What It Catches | Tools | Time |
+|---|---|---|---|
+| **Visual Regression** | Any pixel-level UI change between releases | Playwright toHaveScreenshot() | 2min |
+| **UI Audit** | Overflow, empty containers, unlabeled inputs, broken images | Playwright + DOM assertions | 1min |
+| **Admin Screen Snapshots** | Every settings page, editor panel, plugin list page | Playwright screenshots | 1min |
+| **Mobile Viewport** | Admin at 375px — overflow, stacked elements | Playwright viewport tests | 1min |
+| **Frontend Visual** | Homepage, single post, archive at desktop + mobile | Playwright + toHaveScreenshot | 2min |
+
 ### For Product Managers
 
 No commands to memorize — read `reports/qa-report-{timestamp}.md` after every gauntlet run.
@@ -111,6 +127,16 @@ No commands to memorize — read `reports/qa-report-{timestamp}.md` after every 
 
 **PM workflow**: before every release, open the latest gauntlet report + competitor report → check score deltas → sign off on the pre-release checklist. No terminal needed.
 
+### For End Users (via Real Browser Testing)
+
+| Layer | What It Validates | Tools | Time |
+|---|---|---|---|
+| **User Flow Mapping** | Can a real user find and complete every core action? | Playwright journeys spec | 3min |
+| **Click Depth Scoring** | How many clicks to reach key features? (Yoast: 2, yours: ?) | Journey tests with click counter | 1min |
+| **Wizard / Onboarding Detection** | Does first-time setup exist and work? | Flow spec journey 1 | 1min |
+| **Confusion Scoring** | Tab count × input count × toggle count — complexity index | Audit spec | 1min |
+| **No PHP/JS Errors to User** | Zero fatal errors, zero unhandled JS errors reaching the DOM | Playwright console + body scan | 1min |
+
 ---
 
 ## Quick Start
@@ -118,8 +144,8 @@ No commands to memorize — read `reports/qa-report-{timestamp}.md` after every 
 ### Option 1 — Interactive Setup (Recommended for First Time)
 
 ```bash
-git clone https://github.com/adityaarsharma/plugorbit
-cd plugorbit
+git clone https://github.com/adityaarsharma/orbit
+cd orbit
 bash setup/init.sh
 ```
 
@@ -135,14 +161,14 @@ Every subsequent command reads from `qa.config.json` so you never repeat yoursel
 ### Option 2 — One-Liner (Skip Questions)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/adityaarsharma/plugorbit/main/setup/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/adityaarsharma/orbit/main/setup/install.sh | bash
 ```
 
 ### Option 3 — Manual
 
 ```bash
-git clone https://github.com/adityaarsharma/plugorbit
-cd plugorbit
+git clone https://github.com/adityaarsharma/orbit
+cd orbit
 bash setup/install.sh   # installs all tools
 # Then configure qa.config.json manually (see structure below)
 ```
@@ -151,7 +177,7 @@ bash setup/install.sh   # installs all tools
 
 ## Test Site — Fully Automated (No GUI, No Clicks)
 
-PlugOrbit uses **`@wordpress/env`** (Docker) for full automation or **`wp-now`** for instant, zero-config runs. No GUI apps to install, no click-through setup.
+Orbit uses **`@wordpress/env`** (Docker) for full automation or **`wp-now`** for instant, zero-config runs. No GUI apps to install, no click-through setup.
 
 ### Path A — `@wordpress/env` (recommended for CI-grade isolation)
 
@@ -204,12 +230,12 @@ Great for quick sanity checks. Not great for DB profiling or multi-site matrices
 
 | Scenario | Use |
 |---|---|
-| Full PlugOrbit gauntlet | `wp-env` (via `create-test-site.sh`) |
+| Full Orbit gauntlet | `wp-env` (via `create-test-site.sh`) |
 | Quick single-widget check | `wp-now` |
 | Multi-version matrix (PHP 7.4 × 8.3 × WP 6.3 × latest) | `wp-env` with multiple configs |
 | CI / GitHub Actions later | `wp-env` (works identically in CI) |
 
-Both come with PlugOrbit's power-tools installer:
+Both come with Orbit's power-tools installer:
 
 ```bash
 bash scripts/install-power-tools.sh
@@ -511,7 +537,7 @@ Merge findings by severity."
 
 ## Deep Performance — Beyond Lighthouse
 
-Lighthouse scores the rendered page. PlugOrbit also profiles the parts Lighthouse can't see:
+Lighthouse scores the rendered page. Orbit also profiles the parts Lighthouse can't see:
 
 ### 1. Backend — Which Hook Is Slow?
 
@@ -537,7 +563,7 @@ Shows which files/selectors are shipped but unused.
 
 ### 3. Editor Performance — Elementor + Gutenberg
 
-Most addon bugs live here: editor feels slow, widgets lag, panel freezes. PlugOrbit has a dedicated harness:
+Most addon bugs live here: editor feels slow, widgets lag, panel freezes. Orbit has a dedicated harness:
 
 ```bash
 bash scripts/editor-perf.sh
@@ -565,7 +591,7 @@ Full guide: [docs/deep-performance.md](docs/deep-performance.md) — covers back
 
 ## Claude Code-Native (No CI Required)
 
-PlugOrbit runs **locally, on demand, from Claude Code**. No GitHub Actions, no servers, no API keys, no secrets to manage. Every check is a `/skill` call or a `bash scripts/*.sh` invocation you trigger yourself.
+Orbit runs **locally, on demand, from Claude Code**. No GitHub Actions, no servers, no API keys, no secrets to manage. Every check is a `/skill` call or a `bash scripts/*.sh` invocation you trigger yourself.
 
 **Why local-only?**
 - WordPress plugin QA needs real MySQL, real PHP, real browsers — you have those on your Mac.
@@ -656,7 +682,7 @@ Summary: 6 passed · 1 warning · 0 failed
 
 ## The `plugins/` Drop Box
 
-PlugOrbit has a `plugins/` folder for comparison runs and competitor analysis:
+Orbit has a `plugins/` folder for comparison runs and competitor analysis:
 
 ```
 plugins/
@@ -704,9 +730,9 @@ Full details: [plugins/README.md](plugins/README.md).
 ## Folder Structure
 
 ```
-plugorbit/
+orbit/
 ├── setup/
-│   ├── init.sh                    # Interactive first-run setup (PlugOrbit config)
+│   ├── init.sh                    # Interactive first-run setup (Orbit config)
 │   ├── install.sh                 # Basic dependency installer
 │   └── playground-blueprint.json  # Optional WP Playground local blueprint
 ├── plugins/                        # Plugin zip drop-box (gitignored)
@@ -765,7 +791,7 @@ plugorbit/
 
 ## Power Tools — Level Up Every Claude Code Session
 
-PlugOrbit works on basic tooling, but install the full power kit and every plugin audit becomes a senior-team operation:
+Orbit works on basic tooling, but install the full power kit and every plugin audit becomes a senior-team operation:
 
 ```bash
 bash scripts/install-power-tools.sh
@@ -807,9 +833,9 @@ Full list + install guide: [docs/power-tools.md](docs/power-tools.md).
 
 ---
 
-## Roadmap — How PlugOrbit Gets Better
+## Roadmap — How Orbit Gets Better
 
-PlugOrbit is designed to grow. Tracked ideas:
+Orbit is designed to grow. Tracked ideas:
 
 ### Near-term
 - [ ] **Plugin Check integration** — run [WordPress/plugin-check](https://github.com/WordPress/plugin-check) as Step 9 of gauntlet (mirrors wordpress.org submission checks)
@@ -826,13 +852,13 @@ PlugOrbit is designed to grow. Tracked ideas:
 - [ ] **Visual diff UI** — web viewer for pixel diffs beyond Playwright's HTML reporter
 
 ### Long-term
-- [ ] **Claude Code Skill: `/plugorbit-audit`** — one skill that orchestrates the full gauntlet
-- [ ] **VS Code extension** — run any PlugOrbit script from the editor's command palette
+- [ ] **Claude Code Skill: `/orbit-audit`** — one skill that orchestrates the full gauntlet
+- [ ] **VS Code extension** — run any Orbit script from the editor's command palette
 - [ ] **Release gate bot** — comment on PRs with a pass/fail grid
 - [ ] **Public benchmark dashboard** — community-submitted competitor scores, kept fresh
 
 ### Contribute an idea
-Open an issue at [github.com/adityaarsharma/plugorbit/issues](https://github.com/adityaarsharma/plugorbit/issues) with `[roadmap]` in the title.
+Open an issue at [github.com/adityaarsharma/orbit/issues](https://github.com/adityaarsharma/orbit/issues) with `[roadmap]` in the title.
 
 ---
 
@@ -852,7 +878,7 @@ Keep it research-first. If adding a check: link to the standard or incident that
 
 ## Philosophy
 
-PlugOrbit follows three rules:
+Orbit follows three rules:
 
 1. **Build from config, not hardcoded paths.** Everything reads `qa.config.json`. A config-less run is a smoke test.
 2. **Local-first, not CI-first.** Real MySQL, real PHP, real browsers — already on your Mac. CI is optional plumbing.
@@ -862,7 +888,7 @@ PlugOrbit follows three rules:
 
 ## Credits & Attribution
 
-PlugOrbit stands on the shoulders of open-source skill collections. **You don't need Google Antigravity installed** — every referenced skill works directly inside Claude Code.
+Orbit stands on the shoulders of open-source skill collections. **You don't need Google Antigravity installed** — every referenced skill works directly inside Claude Code.
 
 | Project | What | Link |
 |---|---|---|

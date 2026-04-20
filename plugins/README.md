@@ -1,6 +1,6 @@
 # Plugin Zips — Drop Box
 
-PlugOrbit reads plugin zips from this folder for comparison runs, Pro-vs-Free diffs, and competitor analysis.
+Orbit reads plugin zips from this folder for comparison runs, Pro-vs-Free diffs, and competitor analysis.
 
 ## Folder Structure
 
@@ -29,7 +29,7 @@ plugins/free/<slug>/<slug>-<version>.zip
 
 ### `plugins/pro/` — manual
 
-Pro / paid plugins aren't on wordpress.org, so PlugOrbit can't download them. Drop them here yourself:
+Pro / paid plugins aren't on wordpress.org, so Orbit can't download them. Drop them here yourself:
 
 ```
 plugins/pro/

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PlugOrbit — Power Tools Installer
+# Orbit — Power Tools Installer
 # Installs every code-quality tool worth having for serious WP plugin QA.
 # Safe to re-run: each tool is checked before install.
 
@@ -8,7 +8,7 @@ set -e
 GREEN='\033[0;32m'; YELLOW='\033[1;33m'; CYAN='\033[0;36m'; RED='\033[0;31m'; BOLD='\033[1m'; NC='\033[0m'
 
 echo ""
-echo -e "${BOLD}${CYAN}PlugOrbit Power Tools Installer${NC}"
+echo -e "${BOLD}${CYAN}Orbit Power Tools Installer${NC}"
 echo "This installs every quality tool a senior WP plugin dev uses."
 echo "==============================================================="
 

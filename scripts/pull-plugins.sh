@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PlugOrbit — Auto-download free plugin zips from wordpress.org
+# Orbit — Auto-download free plugin zips from wordpress.org
 # Reads slugs from qa.config.json → downloads latest stable zip per slug
 # Saves to: plugins/free/<slug>/<slug>-<version>.zip
 #
@@ -45,7 +45,7 @@ fi
 mkdir -p "$DEST"
 
 echo ""
-echo -e "${BOLD}PlugOrbit — Pulling free plugin zips from wordpress.org${NC}"
+echo -e "${BOLD}Orbit — Pulling free plugin zips from wordpress.org${NC}"
 echo "Slugs: $SLUGS"
 echo "Destination: $DEST/"
 echo "========================================================"
