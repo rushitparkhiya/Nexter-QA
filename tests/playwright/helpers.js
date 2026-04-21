@@ -210,6 +210,53 @@ async function checkFrontend(page, url) {
   return data;
 }
 
+// ─── attachConsoleErrorGuard — zero-console-error assertion ────────────────────
+// Call at the start of any test to fail if the browser console logs an error
+// during the test. Catches silent JS bugs that QA/PM can't see visually.
+//
+//   const { attachConsoleErrorGuard } = require('../../helpers');
+//   test('does thing', async ({ page }) => {
+//     const guard = attachConsoleErrorGuard(page);
+//     // ... test body ...
+//     guard.assertClean();
+//   });
+
+function attachConsoleErrorGuard(page, opts = {}) {
+  const ignore = opts.ignore || [
+    /favicon/i,
+    /chrome-extension/i,
+    /\[HMR\]/,
+    /DevTools/,
+  ];
+  const errors = [];
+  const pageErrors = [];
+
+  page.on('console', (msg) => {
+    if (msg.type() !== 'error') return;
+    const text = msg.text();
+    if (ignore.some((re) => re.test(text))) return;
+    errors.push(text);
+  });
+
+  page.on('pageerror', (err) => {
+    pageErrors.push(err.message);
+  });
+
+  return {
+    errors,
+    pageErrors,
+    assertClean(label = '') {
+      const all = [...errors, ...pageErrors];
+      if (all.length > 0) {
+        throw new Error(
+          `[orbit] ${all.length} console/page errors during ${label || 'test'}:\n` +
+            all.slice(0, 10).map((e) => `  • ${e.slice(0, 200)}`).join('\n')
+        );
+      }
+    },
+  };
+}
+
 module.exports = {
   assertPageReady,
   detectErrorPage,
@@ -221,5 +268,6 @@ module.exports = {
   countElements,
   checkFrontend,
   snapPair,
+  attachConsoleErrorGuard,
   ADMIN_BASE,
 };

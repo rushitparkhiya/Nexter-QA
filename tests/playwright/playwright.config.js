@@ -52,6 +52,27 @@ module.exports = defineConfig({
       dependencies: ['setup'],
     },
 
+    // ── Firefox — catches Safari-adjacent bugs, CSS Grid edge cases ──
+    {
+      name: 'firefox',
+      use: {
+        ...devices['Desktop Firefox'],
+        storageState: AUTH_FILE,
+      },
+      dependencies: ['setup'],
+    },
+
+    // ── WebKit — Safari engine, catches real Safari-only bugs ──
+    // Run with: npx playwright test --project=webkit
+    {
+      name: 'webkit',
+      use: {
+        ...devices['Desktop Safari'],
+        storageState: AUTH_FILE,
+      },
+      dependencies: ['setup'],
+    },
+
     // ── Visual snapshots — full-page screenshots + UI audit ──
     {
       name: 'visual',
@@ -177,6 +198,44 @@ module.exports = defineConfig({
         ...devices['Desktop Chrome'],
       },
       testMatch: '**/flows/app-passwords.spec.js',
+      dependencies: ['setup'],
+    },
+
+    // ── UX coverage — empty / error / loading / form states ──
+    {
+      name: 'ux-states',
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: AUTH_FILE,
+      },
+      testMatch: [
+        '**/flows/empty-states.spec.js',
+        '**/flows/error-states.spec.js',
+        '**/flows/loading-states.spec.js',
+        '**/flows/form-validation.spec.js',
+      ],
+      dependencies: ['setup'],
+    },
+
+    // ── Plugin conflict matrix (top 20 popular plugins) ──
+    {
+      name: 'conflict',
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: AUTH_FILE,
+      },
+      testMatch: '**/flows/plugin-conflict.spec.js',
+      dependencies: ['setup'],
+    },
+
+    // ── WordPress 7.0 Connectors / Abilities API security ──
+    {
+      name: 'wp7',
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: AUTH_FILE,
+      },
+      testMatch: '**/flows/wp7-connectors.spec.js',
       dependencies: ['setup'],
     },
   ],

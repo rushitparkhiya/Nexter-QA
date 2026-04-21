@@ -79,6 +79,29 @@ else
   ((FAIL++))
 fi
 
+# ── STEP 1b: ZIP HYGIENE + SUPPLY CHAIN + FORBIDDEN FUNCTIONS ────────────────
+# Catches the #1 WP.org auto-rejection triggers (2025):
+#   - Dev files shipped (.git, node_modules, tests/, composer.json)
+#   - Source maps leaking original source
+#   - Forbidden functions (eval, base64_decode, exec, system)
+#   - Vulnerable composer/npm dependencies
+header "Step 1b: Zip Hygiene + Supply Chain"
+log "## Step 1b: Zip Hygiene"
+
+if bash scripts/check-zip-hygiene.sh "$PLUGIN_PATH" 2>&1; then
+  log "- ✓ Zip hygiene + supply chain: clean"
+  ((PASS++))
+else
+  HYGIENE_EXIT=$?
+  if [ "$HYGIENE_EXIT" -eq 1 ]; then
+    log "- ✗ Zip hygiene: dev files or forbidden functions present"
+    ((FAIL++))
+  else
+    log "- ⚠ Zip hygiene: warnings (review above)"
+    ((WARN++))
+  fi
+fi
+
 # ── STEP 2: WORDPRESS CODING STANDARDS ───────────────────────────────────────
 header "Step 2: WordPress Coding Standards (PHPCS)"
 log "## Step 2: PHPCS / WPCS"
