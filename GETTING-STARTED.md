@@ -125,6 +125,9 @@ The table below is your navigation guide to the full Orbit documentation. Find t
 | **Master audit** — every gap, antigravity skill mappings, Day-1 fix table | [docs/16-master-audit.md](docs/16-master-audit.md) |
 | **What's new in v2** — 9 new gauntlet steps, 8 Playwright specs, 5 scripts | [docs/17-whats-new.md](docs/17-whats-new.md) |
 | **Release checklist** — pre-tag gate for Dev/QA/PM/PA roles | [docs/18-release-checklist.md](docs/18-release-checklist.md) |
+| **Business logic testing** — write plugin-specific tests on top of Orbit | [docs/19-business-logic-guide.md](docs/19-business-logic-guide.md) |
+| **Auto-generate tests** — Orbit reads your code, drafts scenarios + specs | [docs/20-auto-test-generation.md](docs/20-auto-test-generation.md) |
+| **VISION** — 6 perspectives, smart principles, ongoing research | [VISION.md](VISION.md) |
 | **Power tools** — extend Orbit with extra tooling | [docs/power-tools.md](docs/power-tools.md) |
 
 **Recommended reading order for beginners:** Start with [docs/00-concepts.md](docs/00-concepts.md) — it explains every tool in the diagram in plain English. Then `01-installation.md` → `02-configuration.md` → `04-gauntlet.md`. The rest you can read on demand when you need it.

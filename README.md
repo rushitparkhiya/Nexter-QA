@@ -18,13 +18,15 @@
 
 <br />
 
-**👨‍💻 Dev** → zero-regression releases &nbsp;·&nbsp; **🧪 QA** → structured test coverage &nbsp;·&nbsp; **📊 PM** → flow maps + complexity scores &nbsp;·&nbsp; **🎨 Designer** → visual diffs + UI audits &nbsp;·&nbsp; **👤 End User** → real browser, real flows
+**👨‍💻 Dev** → zero-regression releases &nbsp;·&nbsp; **🧪 QA** → structured test coverage &nbsp;·&nbsp; **📊 PM** → flow maps + complexity scores &nbsp;·&nbsp; **📈 PA** → analytics events verified &nbsp;·&nbsp; **🎨 Designer** → visual diffs + UI audits &nbsp;·&nbsp; **👤 End User** → real browser, real flows
+
+📖 **[Read VISION.md](VISION.md)** — the anchor doc defining Orbit's 6 perspectives, smart principles, and ongoing research loop
 
 Covers **Elementor Addons · Gutenberg Blocks · SEO Plugins · WooCommerce Extensions · Themes**
 
 <br />
 
-[Quick Start](#quick-start) · [What It Checks](#what-it-checks) · [Skills Reference](SKILLS.md) · [GitHub](https://github.com/adityaarsharma/orbit) · [Common WP Mistakes](docs/common-wp-mistakes.md)
+[Quick Start](#quick-start) · [What It Checks](#what-it-checks) · [Skills Reference](SKILLS.md) · [Auto-Generate Tests](docs/20-auto-test-generation.md) · [Business Logic Guide](docs/19-business-logic-guide.md) · [GitHub](https://github.com/adityaarsharma/orbit) · [Common WP Mistakes](docs/common-wp-mistakes.md)
 
 </div>
 
@@ -49,6 +51,25 @@ One command and you get:
 - ✅ Zero hardcoding — works for any WP plugin type (Elementor, Gutenberg, SEO, WooCommerce, themes)
 
 **The outcome**: every release goes through the same scrutiny as if a Dev, QA engineer, PM, Designer, and beta tester all signed off — automated.
+
+---
+
+## 🆕 Auto-Scaffolding: Orbit Reads Your Plugin Code and Generates Tests
+
+Point Orbit at any plugin directory. It reads every `add_menu_page`, `register_rest_route`, `add_shortcode`, `wp_ajax_`, `wp_schedule_event`, `block.json`, `register_post_type` — then generates:
+
+```bash
+bash scripts/scaffold-tests.sh ~/plugins/my-plugin [--deep]
+```
+
+→ **`scaffold-out/my-plugin/qa.config.json`** — prefilled with every detected entry point
+→ **`scaffold-out/my-plugin/qa-scenarios.md`** — 40-80 structured QA scenarios
+→ **`tests/playwright/flows/scaffold-my-plugin-smoke.spec.js`** — draft Playwright spec
+→ (with `--deep`) **`ai-scenarios.md`** — AI reads code, writes business-logic scenarios with file:line refs
+
+[→ Full auto-test-generation guide](docs/20-auto-test-generation.md) &nbsp;·&nbsp; [→ Business logic testing guide](docs/19-business-logic-guide.md)
+
+---
 
 Built and maintained by [@adityaarsharma](https://github.com/adityaarsharma). Works with any Claude Code-enabled machine.
 
