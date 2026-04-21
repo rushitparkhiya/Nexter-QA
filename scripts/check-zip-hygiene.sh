@@ -151,7 +151,7 @@ for pattern in "${FORBIDDEN[@]}"; do
     --exclude-dir=vendor --exclude-dir=node_modules --exclude-dir=tests 2>/dev/null | \
     grep -vE "//.*$pattern|#.*$pattern|/\*.*$pattern" | head -5 || true)
   if [ -n "$HITS" ]; then
-    FUNC_NAME=$(echo "$pattern" | sed 's/[^a-z_]//g' | head -c 30)
+    FUNC_NAME=$(echo "$pattern" | sed 's/[^a-zA-Z0-9_]//g' | head -c 30)
     echo -e "${RED}✗ Forbidden function: ${FUNC_NAME}${NC}"
     echo "$HITS" | head -2
     FF_FAIL=1
@@ -163,7 +163,7 @@ for pattern in "${WARN_PATTERNS[@]}"; do
     --exclude-dir=vendor --exclude-dir=node_modules --exclude-dir=tests 2>/dev/null | \
     grep -vE "//.*$pattern|#.*$pattern|/\*.*$pattern" | head -3 || true)
   if [ -n "$HITS" ]; then
-    FUNC_NAME=$(echo "$pattern" | sed 's/[^a-z_]//g' | head -c 30)
+    FUNC_NAME=$(echo "$pattern" | sed 's/[^a-zA-Z0-9_]//g' | head -c 30)
     echo -e "${YELLOW}⚠ ${FUNC_NAME} usage (review context — WP core uses this for legit cases):${NC}"
     echo "$HITS" | head -2
     WARN=1

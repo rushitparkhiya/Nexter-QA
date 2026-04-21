@@ -238,6 +238,43 @@ module.exports = defineConfig({
       testMatch: '**/flows/wp7-connectors.spec.js',
       dependencies: ['setup'],
     },
+
+    // ── PM role: full user journey, FTUE, analytics ──
+    {
+      name: 'pm',
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: AUTH_FILE,
+        video: { mode: 'on', size: { width: 1440, height: 900 } },
+      },
+      testMatch: [
+        '**/flows/user-journey.spec.js',
+        '**/flows/onboarding-ftue.spec.js',
+      ],
+      dependencies: ['setup'],
+    },
+
+    // ── PA role: analytics events firing ──
+    {
+      name: 'analytics',
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: AUTH_FILE,
+      },
+      testMatch: '**/flows/analytics-events.spec.js',
+      dependencies: ['setup'],
+    },
+
+    // ── Visual regression vs previous release tag ──
+    {
+      name: 'visual-release',
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: AUTH_FILE,
+      },
+      testMatch: '**/flows/visual-regression-release.spec.js',
+      dependencies: ['setup'],
+    },
   ],
 
   // WP Playground server for CI

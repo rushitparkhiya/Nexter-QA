@@ -122,6 +122,9 @@ The table below is your navigation guide to the full Orbit documentation. Find t
 | **Role guides** — Developer, QA, PM, Designer workflows | [docs/13-roles.md](docs/13-roles.md) |
 | **Common WP mistakes** — 17 patterns Orbit catches automatically | [docs/common-wp-mistakes.md](docs/common-wp-mistakes.md) |
 | **CI/CD integration** — GitHub Actions, automated release gates | [docs/15-ci-cd.md](docs/15-ci-cd.md) |
+| **Master audit** — every gap, antigravity skill mappings, Day-1 fix table | [docs/16-master-audit.md](docs/16-master-audit.md) |
+| **What's new in v2** — 9 new gauntlet steps, 8 Playwright specs, 5 scripts | [docs/17-whats-new.md](docs/17-whats-new.md) |
+| **Release checklist** — pre-tag gate for Dev/QA/PM/PA roles | [docs/18-release-checklist.md](docs/18-release-checklist.md) |
 | **Power tools** — extend Orbit with extra tooling | [docs/power-tools.md](docs/power-tools.md) |
 
 **Recommended reading order for beginners:** Start with [docs/00-concepts.md](docs/00-concepts.md) — it explains every tool in the diagram in plain English. Then `01-installation.md` → `02-configuration.md` → `04-gauntlet.md`. The rest you can read on demand when you need it.

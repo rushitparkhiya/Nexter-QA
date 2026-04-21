@@ -79,6 +79,59 @@ else
   ((FAIL++))
 fi
 
+# ── STEP 1a: RELEASE GATE (plugin header, readme.txt, version parity, license) ──
+# Runs only in --mode release|full. Blocks tag if any disagreement found.
+if [ "$MODE" = "full" ] || [ "$MODE" = "release" ]; then
+  header "Step 1a: Release Metadata"
+  log "## Step 1a: Release Metadata"
+
+  # Plugin header
+  if bash scripts/check-plugin-header.sh "$PLUGIN_PATH" 2>&1; then
+    log "- ✓ Plugin header"; ((PASS++))
+  else
+    log "- ✗ Plugin header"; ((FAIL++))
+  fi
+
+  # readme.txt
+  if [ -f "$PLUGIN_PATH/readme.txt" ]; then
+    if bash scripts/check-readme-txt.sh "$PLUGIN_PATH" 2>&1; then
+      log "- ✓ readme.txt"; ((PASS++))
+    else
+      log "- ✗ readme.txt"; ((FAIL++))
+    fi
+  fi
+
+  # Version parity
+  if bash scripts/check-version-parity.sh "$PLUGIN_PATH" 2>&1; then
+    log "- ✓ Version parity"; ((PASS++))
+  else
+    log "- ✗ Version parity"; ((FAIL++))
+  fi
+
+  # License compliance
+  if bash scripts/check-license.sh "$PLUGIN_PATH" 2>&1; then
+    log "- ✓ License compliance"; ((PASS++))
+  else
+    log "- ⚠ License compliance"; ((WARN++))
+  fi
+
+  # block.json (only if blocks present)
+  if find "$PLUGIN_PATH" -name "block.json" -not -path "*/node_modules/*" 2>/dev/null | grep -q .; then
+    if bash scripts/check-block-json.sh "$PLUGIN_PATH" 2>&1; then
+      log "- ✓ block.json"; ((PASS++))
+    else
+      log "- ⚠ block.json"; ((WARN++))
+    fi
+  fi
+
+  # HPOS — only fires if plugin touches WooCommerce
+  if bash scripts/check-hpos-declaration.sh "$PLUGIN_PATH" 2>&1; then
+    log "- ✓ HPOS (or not applicable)"; ((PASS++))
+  else
+    log "- ✗ HPOS declaration missing"; ((FAIL++))
+  fi
+fi
+
 # ── STEP 1b: ZIP HYGIENE + SUPPLY CHAIN + FORBIDDEN FUNCTIONS ────────────────
 # Catches the #1 WP.org auto-rejection triggers (2025):
 #   - Dev files shipped (.git, node_modules, tests/, composer.json)
