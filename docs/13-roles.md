@@ -13,8 +13,9 @@
 1. [Developer](#1-developer)
 2. [QA Engineer](#2-qa-engineer)
 3. [Product Manager](#3-product-manager)
-4. [Designer / UI Review](#4-designer--ui-review)
-5. [Team Workflow: Pre-Release Sequence](#5-team-workflow-pre-release-sequence)
+4. [Product Analyst](#4-product-analyst-pa)
+5. [Designer / UI Review](#5-designer--ui-review)
+6. [Team Workflow: Pre-Release Sequence](#6-team-workflow-pre-release-sequence)
 
 ---
 
@@ -325,7 +326,52 @@ After every release, ask the developer for:
 
 ---
 
-## 4. Designer / UI Review
+## 4. Product Analyst (PA)
+
+You own: tracking implementation, event schemas, funnel completeness, consent compliance.
+
+### Daily workflow
+
+Most days you're not in the codebase — you're in the dashboard looking at data that should be flowing. Orbit's job for you is verifying that events actually fire when users take actions, with the right payload.
+
+```bash
+# Define the events you expect to fire, as JSON
+export PLUGIN_ANALYTICS_EVENTS='[
+  {"action":"click","selector":"#save-btn","expect_event":"plugin_save","endpoint_match":"google-analytics"},
+  {"action":"submit","selector":"form#checkout","expect_event":"checkout_completed","endpoint_match":"mixpanel"},
+  {"action":"click","selector":".upgrade-cta","expect_event":"upgrade_cta_clicked","endpoint_match":"/wp-json/.*track"}
+]'
+
+npx playwright test --project=analytics
+```
+
+### What you check before every release
+
+1. **Every tracked event still fires** — selectors in the UI don't break silently. A button moves, renames, or gets a new class — the event breaks. This spec catches it.
+
+2. **Consent mode blocks what it should** — run the spec twice: with consent cookie present (events should fire), without (events should NOT fire). If events fire without consent = GDPR risk.
+
+3. **Payload shape is correct** — extend the analytics spec to inspect `req.postData()` and assert the event contains expected fields (`user_id`, `plan`, `feature_name`, etc.).
+
+### Decision rule
+
+If ANY declared event doesn't fire → **tracking is broken**. This is P0 for a product analyst because every dashboard downstream becomes wrong — you'll make decisions on bad data. Fix before release.
+
+### What you own in reports
+
+- `reports/playwright-results.json` — filter for the `analytics` project
+- Browser console logs captured by `attachConsoleErrorGuard` — often reveals tracking script errors (GA not loaded, Mixpanel token wrong, etc.)
+
+### Questions to ask devs before release
+
+- "Did any of the tracked selectors change in this release?"
+- "Are new features / flows tracked, or did we ship blind?"
+- "Does the consent-mode check still pass with the current cookie banner?"
+- "What's the payload shape on the new event — can I see an example?"
+
+---
+
+## 5. Designer / UI Review
 
 You own: visual quality, UX polish, consistency with the design system, and the visual regression baseline.
 
@@ -421,7 +467,7 @@ WP_TEST_URL=http://localhost:8881 npx playwright test \
 
 ---
 
-## 5. Team Workflow: Pre-Release Sequence
+## 6. Team Workflow: Pre-Release Sequence
 
 Who does what, in what order, before tagging a release.
 

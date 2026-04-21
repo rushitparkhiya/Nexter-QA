@@ -24,7 +24,9 @@
 
 ---
 
-**v2.0 · April 2026 · Mature release** — covers WP.org plugin-check canonical rules, Patchstack 2025 top-5 vulnerability classes, WP 6.5→7.0 features, PHP 8.0→8.5 compatibility, and the April 2026 EssentialPlugin supply-chain attack patterns. 22 security patterns · 20+ Playwright specs · 5 custom Claude skills · auto-scaffolder that reads your plugin code.
+**v2.3.0 · April 2026 · Unique Layer** — 22 security patterns · 20+ Playwright specs · 5 custom Claude skills · auto-scaffolder reading your plugin code · **plugin ownership-transfer detection** (April 2026 attack defense, first in the WP ecosystem) · **live CVE correlation** (free, via NVD + WPScan public feeds — no API keys). Covers WP.org plugin-check rules, Patchstack 2025 top-5 vulns, WP 6.5→7.0 features, PHP 8.0→8.5.
+
+🎯 **[Use Cases](docs/24-use-cases.md)** (25 real scenarios · Dev/QA/PM/PA/Designer/Release-Ops) &nbsp;·&nbsp; 🧩 **[Extending Orbit](docs/23-extending-orbit.md)** (how to add checks, write specs, create skills)
 
 Covers **Elementor Addons · Gutenberg Blocks · SEO Plugins · WooCommerce Extensions · Themes**
 

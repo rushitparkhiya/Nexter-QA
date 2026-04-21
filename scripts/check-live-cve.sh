@@ -23,6 +23,8 @@ PLUGIN_PATH="${1:-}"
 
 GREEN='\033[0;32m'; YELLOW='\033[1;33m'; RED='\033[0;31m'; CYAN='\033[0;36m'; NC='\033[0m'
 
+# Cache dir (override with ORBIT_CACHE_DIR env var — useful in CI with ephemeral $HOME
+# to avoid hitting NVD/WPScan rate limits on every run)
 CACHE_DIR="${ORBIT_CACHE_DIR:-$HOME/.cache/orbit/cve}"
 mkdir -p "$CACHE_DIR"
 
@@ -44,7 +46,7 @@ if ! cache_fresh "$NVD_FILE"; then
   echo "→ Pulling NVD (NIST) recent WordPress CVEs..."
   PUB_START=$(python3 -c "import datetime; print((datetime.datetime.utcnow() - datetime.timedelta(days=60)).strftime('%Y-%m-%dT00:00:00.000'))")
   PUB_END=$(python3 -c "import datetime; print(datetime.datetime.utcnow().strftime('%Y-%m-%dT23:59:59.999'))")
-  curl -s -H "User-Agent: Orbit-QA-Framework" \
+  curl -s --max-time 30 --connect-timeout 10 -H "User-Agent: Orbit-QA-Framework" \
     "https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=wordpress+plugin&pubStartDate=${PUB_START}&pubEndDate=${PUB_END}&resultsPerPage=100" \
     -o "$NVD_FILE" 2>/dev/null || echo '{"vulnerabilities":[]}' > "$NVD_FILE"
 else
@@ -57,12 +59,12 @@ if ! cache_fresh "$WPSCAN_FILE"; then
   echo "→ Pulling WPScan public feed..."
   # Try authenticated first (if user has set WPSCAN_API_TOKEN), else scrape public endpoint
   if [ -n "${WPSCAN_API_TOKEN:-}" ]; then
-    curl -s -H "User-Agent: Orbit-QA-Framework" -H "Authorization: Token token=${WPSCAN_API_TOKEN}" \
+    curl -s --max-time 30 --connect-timeout 10 -H "User-Agent: Orbit-QA-Framework" -H "Authorization: Token token=${WPSCAN_API_TOKEN}" \
       "https://wpscan.com/api/v3/vulnerabilities?format=json&per_page=100" \
       -o "$WPSCAN_FILE" 2>/dev/null || echo "[]" > "$WPSCAN_FILE"
   else
     # Best-effort unauthenticated — falls back to empty if blocked
-    curl -s -H "User-Agent: Mozilla/5.0 Orbit-QA" \
+    curl -s --max-time 30 --connect-timeout 10 -H "User-Agent: Mozilla/5.0 Orbit-QA" \
       "https://wpscan.com/api/v3/vulnerabilities?format=json&per_page=50" \
       -o "$WPSCAN_FILE" 2>/dev/null || echo "[]" > "$WPSCAN_FILE"
   fi
@@ -183,14 +185,19 @@ if grep -iqE "xss|cross.site scripting|stored script" "$PATTERNS_FILE"; then
   fi
 fi
 
-# Deserialization patterns (April 2026 EssentialPlugin signature)
+# Deserialization on NETWORK/USER input only (April 2026 EssentialPlugin signature)
+# IMPORTANT: plain `unserialize(get_option(...))` is legitimate WP core pattern —
+# we only flag unserialize() with HTTP response / $_GET/$_POST / file_get_contents
+# of remote URL. This drastically reduces false positives.
 if grep -iqE "deserialization|unserialize|object injection|php object" "$PATTERNS_FILE"; then
-  UNSERIALIZE=$(grep -rEn "(^|[^a-zA-Z_>])unserialize\s*\(" "$PLUGIN_PATH" --include="*.php" \
+  # Match unserialize() where the argument line contains a network/user source
+  UNSERIALIZE=$(grep -rEn "unserialize\s*\([^)]*(wp_remote_|file_get_contents\s*\(\s*['\"]http|\\\$_(GET|POST|REQUEST|COOKIE)|base64_decode)" \
+    "$PLUGIN_PATH" --include="*.php" \
     --exclude-dir=vendor --exclude-dir=node_modules 2>/dev/null | head -2 || true)
   if [ -n "$UNSERIALIZE" ]; then
-    echo -e "${RED}✗${NC} Deserialization disclosed in recent CVEs — your plugin uses unserialize():"
+    echo -e "${RED}✗${NC} Deserialization of NETWORK/USER input disclosed in recent CVEs — your plugin matches:"
     echo "$UNSERIALIZE" | head -1 | sed 's/^/     /'
-    HITS+=("PHP Object Injection")
+    HITS+=("PHP Object Injection via untrusted input")
   fi
 fi
 
@@ -207,20 +214,24 @@ fi
 
 # CSRF / missing nonce
 if grep -iqE "csrf|cross.site request|missing nonce" "$PATTERNS_FILE"; then
-  # Find admin-post / admin-ajax handlers and check if they have wp_verify_nonce nearby
+  # Find admin-post / admin-ajax handlers and check if they have wp_verify_nonce nearby.
+  # NOTE: file-level check — not per-callback. Downgraded to WARN because a file
+  # with 10 handlers may have nonce checks in some but not all; this check alone
+  # can't distinguish. Use /orbit-wp-security skill for per-callback analysis.
   HANDLERS=$(grep -rEln "add_action\s*\(\s*[\"'](admin_post_|wp_ajax_)" "$PLUGIN_PATH" --include="*.php" \
     --exclude-dir=vendor --exclude-dir=node_modules 2>/dev/null || true)
   if [ -n "$HANDLERS" ]; then
     MISSING=""
-    for f in $HANDLERS; do
+    while IFS= read -r f; do
+      [ -z "$f" ] && continue
       if ! grep -qE "wp_verify_nonce|check_admin_referer|check_ajax_referer" "$f" 2>/dev/null; then
-        MISSING="$MISSING $f"
+        MISSING="$MISSING$f"$'\n'
       fi
-    done
+    done <<< "$HANDLERS"
     if [ -n "$MISSING" ]; then
-      echo -e "${RED}✗${NC} CSRF disclosed in recent CVEs — files register admin handlers without nonce check:"
-      echo "$MISSING" | tr ' ' '\n' | head -3 | sed 's/^/     /'
-      HITS+=("CSRF — missing nonce verification")
+      echo -e "${YELLOW}⚠${NC} CSRF patterns disclosed in recent CVEs — files with admin handlers lack any nonce check (coarse — verify per-callback with /orbit-wp-security):"
+      printf '%s' "$MISSING" | head -3 | sed 's/^/     /'
+      HITS+=("CSRF — potential missing nonce (coarse file-level check)")
     fi
   fi
 fi

@@ -129,6 +129,8 @@ The table below is your navigation guide to the full Orbit documentation. Find t
 | **Auto-generate tests** — Orbit reads your code, drafts scenarios + specs | [docs/20-auto-test-generation.md](docs/20-auto-test-generation.md) |
 | **VISION** — 6 perspectives, smart principles, ongoing research | [VISION.md](VISION.md) |
 | **What Orbit Does (v2.0)** — shareable overview: capabilities, benefits, diffs vs alternatives | [docs/22-what-orbit-does.md](docs/22-what-orbit-does.md) |
+| **Extending Orbit** — ideate, plan, add checks, write specs, create custom skills | [docs/23-extending-orbit.md](docs/23-extending-orbit.md) |
+| **Use Cases** — 25 real scenarios by role (Dev / QA / PM / PA / Designer / Release Ops) | [docs/24-use-cases.md](docs/24-use-cases.md) |
 | **Evergreen Security Log** — living attack-pattern catalog, 90-day cadence | [docs/21-evergreen-security.md](docs/21-evergreen-security.md) |
 | **Power tools** — extend Orbit with extra tooling | [docs/power-tools.md](docs/power-tools.md) |
 

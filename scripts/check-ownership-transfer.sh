@@ -36,11 +36,21 @@ echo "Tracing ownership history for: $MAIN_FILE_REL"
 echo ""
 
 HISTORY_FILE=$(mktemp)
-trap "rm -f $HISTORY_FILE" EXIT
+trap 'rm -f "$HISTORY_FILE"' EXIT
 
 cd "$PLUGIN_PATH"
+
+# Shallow-clone / sparse-history detection — CI with --depth=1 has no history
+COMMIT_COUNT=$(git rev-list --count HEAD 2>/dev/null || echo 0)
+if [ "$COMMIT_COUNT" -lt 3 ]; then
+  echo "Only $COMMIT_COUNT commit(s) in history — likely shallow clone. Skipping ownership trace."
+  echo "For full check in CI: fetch-depth: 0 in actions/checkout"
+  exit 0
+fi
+
 # For each commit, extract the three fields at that point
-git log --all --format='%H|%ci|%s' --follow -- "$MAIN_FILE_REL" | while IFS='|' read -r hash date subject; do
+# Note: --follow + --all is undefined per git docs; using --follow alone
+git log --format='%H|%ci|%s' --follow -- "$MAIN_FILE_REL" | while IFS='|' read -r hash date subject; do
   CONTENT=$(git show "$hash:$MAIN_FILE_REL" 2>/dev/null | head -50 || true)
   AUTHOR=$(echo "$CONTENT" | grep -iE "^\s*\*?\s*Author:" | head -1 | sed -E 's/.*Author:\s*//' | tr -d '\r' | head -c 100)
   AUTHOR_URI=$(echo "$CONTENT" | grep -iE "^\s*\*?\s*Author URI:" | head -1 | sed -E 's/.*Author URI:\s*//' | tr -d '\r' | head -c 100)
@@ -56,14 +66,26 @@ if [ ! -s "$HISTORY_FILE" ]; then
   exit 0
 fi
 
-# Detect distinct (Author, Author URI, Plugin Name) tuples
-AUTHORS=$(awk -F'|' '{gsub(/^ +| +$/, "", $4); print $4}' "$HISTORY_FILE" | sort -u | grep -v '^Author=\?$')
-AUTHOR_URIS=$(awk -F'|' '{gsub(/^ +| +$/, "", $5); print $5}' "$HISTORY_FILE" | sort -u | grep -v '^URI=\?$')
-NAMES=$(awk -F'|' '{gsub(/^ +| +$/, "", $6); print $6}' "$HISTORY_FILE" | sort -u | grep -v '^Name=\?$')
+# Detect distinct (Author, Author URI, Plugin Name) tuples.
+# Filter:
+#   - empty rows (no author yet, or failed git show)
+#   - WP boilerplate placeholders ("Your Name", "Your Name or Your Company", etc.)
+#   - values that are just "Author=?" or "URI=?" sentinels (shouldn't happen but defensive)
+filter_placeholders() {
+  grep -vE '^\s*$|^Your Name$|^Your Name or Your Company$|^TODO|^\?$|^Author=\?$|^URI=\?$|^Name=\?$'
+}
 
-AUTHOR_COUNT=$(echo "$AUTHORS" | grep -c .)
-URI_COUNT=$(echo "$AUTHOR_URIS" | grep -c .)
-NAME_COUNT=$(echo "$NAMES" | grep -c .)
+AUTHORS=$(awk -F'|' '{sub(/^Author=/, "", $4); gsub(/^ +| +$/, "", $4); print $4}' "$HISTORY_FILE" | sort -u | filter_placeholders || true)
+AUTHOR_URIS=$(awk -F'|' '{sub(/^URI=/, "", $5); gsub(/^ +| +$/, "", $5); print $5}' "$HISTORY_FILE" | sort -u | filter_placeholders || true)
+NAMES=$(awk -F'|' '{sub(/^Name=/, "", $6); gsub(/^ +| +$/, "", $6); print $6}' "$HISTORY_FILE" | sort -u | filter_placeholders || true)
+
+# grep -c . returns exit 1 on zero matches; guard under set -e
+AUTHOR_COUNT=$(printf '%s\n' "$AUTHORS" | grep -c . 2>/dev/null || true)
+URI_COUNT=$(printf '%s\n' "$AUTHOR_URIS" | grep -c . 2>/dev/null || true)
+NAME_COUNT=$(printf '%s\n' "$NAMES" | grep -c . 2>/dev/null || true)
+AUTHOR_COUNT=${AUTHOR_COUNT:-0}
+URI_COUNT=${URI_COUNT:-0}
+NAME_COUNT=${NAME_COUNT:-0}
 
 FAIL=0
 WARN=0
