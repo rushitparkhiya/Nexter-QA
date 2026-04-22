@@ -43,13 +43,16 @@ A plugin is judged from six distinct angles. Any release Orbit approves must sat
 - Keyboard navigation, focus trap detection, admin color scheme matrix, RTL layout
 
 ### 3. 👔 Product Manager
-**What they need:** Real user flows validated. "Time to first value" measured.
+**What they need:** Real user flows validated. "Time to first value" measured. Product feels guided, not abandoned.
 **What Orbit gives them:**
 - Full user journey template (`user-journey.spec.js`) — install → configure → use → uninstall as one flow
 - First-time user experience (`onboarding-ftue.spec.js`) — 3-clicks-to-core-feature metric
 - Empty / error / loading / form-validation state coverage
 - UAT HTML report with screenshots + video
 - Reports index HTML — one landing page per release
+- **UI text spell-check** — every visible string (labels, buttons, tooltips, placeholders, error messages) scanned for typos before users see them
+- **Guided experience score** — detects whether first-time users are welcomed with wizard steps, contextual hints, or inline help — or dropped cold into a blank UI; scores guidance depth
+- **Label + option ordering audit** — form labels checked for clarity; select/radio/checkbox options scanned for logical ordering (alphabetical, frequency-first, or task-flow order); surfaces confusing sequences a real user would get stuck on
 
 ### 4. 📊 Product Analyst
 **What they need:** Analytics events actually fire when they should.
@@ -134,6 +137,7 @@ Orbit never hardcodes a plugin slug, brand, or path. Every script takes `<plugin
 | Performance | Lighthouse + DB profile + memory + object cache + **script loading strategy + Script Modules dynamic deps** | ✅ shipped |
 | Accessibility | axe + keyboard + colors + RTL | ✅ shipped |
 | PM / PA | User journey + FTUE + analytics + empty/error/loading states | ✅ shipped |
+| **PM UX Quality** | UI text spell-check + guided experience score + label/option ordering audit | 🗺️ roadmap |
 | Modern WP (6.5–7.0) | Script Modules, Interactivity API, Block Bindings, Site Health, Plugin Dependencies, plugin-updater detection, external menu links | ✅ shipped |
 | Auto-scaffolding | `scaffold-tests.sh` reads plugin + generates config + scenarios + specs | ✅ shipped |
 | CI | GitHub Actions, pre-commit hook, dry-run preflight | ✅ shipped |
@@ -217,4 +221,4 @@ Treat VISION.md like the plugin-itself header. When the surface materially chang
 - **Minor change** — adding one check: update the "Current State" table only.
 - **Major change** — adding a new perspective, removing a principle, changing an anti-goal: new commit with a changelog line in CHANGELOG.md.
 
-Last material update: April 2026 — completed PM/PA role coverage, auto-scaffolder shipped, VISION.md established.
+Last material update: April 2026 — completed PM/PA role coverage, auto-scaffolder shipped, VISION.md established. Added PM UX Quality checks: UI text spell-check, guided experience score, label/option ordering audit.

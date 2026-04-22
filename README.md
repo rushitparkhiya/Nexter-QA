@@ -165,6 +165,9 @@ No commands to memorize — read `reports/qa-report-{timestamp}.md` after every 
 | **Pre-Release Checklist** | Sign-off gate before shipping | 60-point checklist | [checklists/pre-release-checklist.md](checklists/pre-release-checklist.md) |
 | **UI/UX Checklist** | "Does this feel premium?" | 40-point checklist | [checklists/ui-ux-checklist.md](checklists/ui-ux-checklist.md) |
 | **Changelog → Risk Map** | "What does this release change that could break?" | Test plan per changelog entry | `scripts/changelog-test.sh` |
+| **Spell-Check Scan** | Typos in labels, buttons, tooltips, error messages — caught before users see them | Typo list per screen | Gauntlet report |
+| **Guided Experience Score** | Does product guide new users or drop them cold? Wizard steps, hints, inline help detection | 0–10 guidance score | FTUE report |
+| **Label + Option Ordering** | Confusing labels, illogically ordered select/radio/checkbox options | Flagged list per form | Admin audit |
 
 **PM workflow**: before every release, open the latest gauntlet report + competitor report → check score deltas → sign off on the pre-release checklist. No terminal needed.
 
