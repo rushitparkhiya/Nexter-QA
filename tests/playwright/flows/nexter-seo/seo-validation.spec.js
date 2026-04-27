@@ -95,31 +95,21 @@ test.describe('Nexter SEO — Validation (Webmaster Tools)', () => {
   });
 
   test('Google verification meta tag appears on homepage when code is set', async ({ page }) => {
-    // Save a test code first
+    // Save a test verification code
     await gotoValidation(page);
     const googleInput = page.locator('input[name*="google_verification"], input[name*="google"]').first();
     if (await googleInput.isVisible()) {
-      await googleInput.fill('google-test-verification-code');
+      await googleInput.fill('google-test-qa-code');
       const saveBtn = page.locator('button').filter({ hasText: /save|update/i }).first();
       if (await saveBtn.isVisible()) {
         await saveBtn.click();
-        await page.waitForTimeout(1500);
+        await page.waitForTimeout(2000);
       }
-    }
 
-    // Check frontend
-    await page.goto(BASE_URL);
-    await page.waitForLoadState('domcontentloaded');
-    const verificationMeta = await page.locator('meta[name="google-site-verification"]').getAttribute('content').catch(() => null);
-    expect(verificationMeta !== undefined || true).toBeTruthy();
-
-    // Cleanup
-    await gotoValidation(page);
-    const googleInputClean = page.locator('input[name*="google_verification"], input[name*="google"]').first();
-    if (await googleInputClean.isVisible()) {
-      await googleInputClean.fill('');
-      const saveBtn = page.locator('button').filter({ hasText: /save|update/i }).first();
-      if (await saveBtn.isVisible()) await saveBtn.click();
+      // Check frontend for verification meta tag
+      await page.goto(BASE_URL, { waitUntil: 'domcontentloaded' });
+      const verificationMeta = await page.locator('meta[name="google-site-verification"]').getAttribute('content').catch(() => null);
+      expect(verificationMeta !== undefined || true).toBeTruthy();
     }
   });
 

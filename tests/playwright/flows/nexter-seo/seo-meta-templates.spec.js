@@ -54,9 +54,11 @@ test.describe('Nexter SEO — Meta Templates', () => {
   test('Template variable tokens are available (e.g. %site_name%)', async ({ page }) => {
     await page.waitForTimeout(2000);
 
-    const tokenBtn = page.locator('button, span, a').filter({ hasText: /%|variable|token|tag|insert/i }).first();
+    // Look for token/variable buttons inside plugin area only — avoid WP admin nav links
+    const tokenBtn = page.locator('.nxt-content-seo-mount button, #nexter-content-seo button').filter({ hasText: /variable|token|insert/i }).first();
     const tokenVisible = await tokenBtn.isVisible().catch(() => false);
     if (tokenVisible) {
+      await tokenBtn.scrollIntoViewIfNeeded();
       await tokenBtn.click();
       await page.waitForTimeout(500);
     }

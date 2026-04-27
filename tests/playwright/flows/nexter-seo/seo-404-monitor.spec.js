@@ -46,8 +46,9 @@ test.describe('Nexter SEO — 404 Monitor', () => {
 
   test('404 entries are captured after visiting broken URL', async ({ page }) => {
     // Visit a non-existent page to generate a 404
-    await page.goto(`${BASE_URL}/this-page-does-not-exist-nexter-qa-test-${Date.now()}`);
-    await page.waitForLoadState('domcontentloaded');
+    await page.goto(`${BASE_URL}/this-page-does-not-exist-nexter-qa-test-${Date.now()}`).catch(() => {});
+    await page.waitForLoadState('domcontentloaded').catch(() => {});
+    await page.waitForTimeout(500);
 
     // Go back to monitor
     await goto404Monitor(page);

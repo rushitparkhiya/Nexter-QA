@@ -56,16 +56,17 @@ test.describe('Nexter SEO — Import / Export', () => {
 
   test('Export download initiates a file download', async ({ page }) => {
     await gotoImportExport(page);
-    const exportBtn = page.locator('button, a').filter({ hasText: /export|download/i }).first();
+    // Scope to plugin area only — avoid matching WP core export.php link
+    const exportBtn = page.locator('.nxt-content-seo-mount button, .nxt-content-seo-mount a, #nexter-content-seo button, #nexter-content-seo a, .wrap button, .wrap a').filter({ hasText: /export|download/i }).first();
     if (await exportBtn.isVisible()) {
+      await exportBtn.scrollIntoViewIfNeeded();
       const [download] = await Promise.all([
         page.waitForEvent('download', { timeout: 15000 }).catch(() => null),
-        exportBtn.click(),
+        exportBtn.click({ force: true }),
       ]);
       if (download) {
         const suggestedName = download.suggestedFilename();
         expect(suggestedName.length).toBeGreaterThan(0);
-        // Save locally for import test
         fs.mkdirSync(path.dirname(EXPORT_SAVE_PATH), { recursive: true });
         await download.saveAs(EXPORT_SAVE_PATH);
         expect(fs.existsSync(EXPORT_SAVE_PATH)).toBeTruthy();
