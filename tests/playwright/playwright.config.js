@@ -2,7 +2,7 @@
 const { defineConfig, devices } = require('@playwright/test');
 const path = require('path');
 
-const BASE_URL  = process.env.WP_TEST_URL || 'http://localhost:8881';
+const BASE_URL  = process.env.WP_TEST_URL || 'http://localhost:8882';
 const AUTH_FILE = path.join(__dirname, '../../.auth/wp-admin.json');
 
 // HTML report: reports/playwright-html/index.html
