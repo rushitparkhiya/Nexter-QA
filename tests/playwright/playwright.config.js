@@ -15,7 +15,11 @@ module.exports = defineConfig({
     toHaveScreenshot: { maxDiffPixelRatio: 0.02, threshold: 0.2 },
   },
   fullyParallel: true,
-  workers: process.env.PLAYWRIGHT_WORKERS || (process.env.CI ? 1 : '50%'),
+  workers: (() => {
+    const w = process.env.PLAYWRIGHT_WORKERS;
+    if (w) return w.endsWith('%') ? w : parseInt(w, 10);
+    return process.env.CI ? 1 : '50%';
+  })(),
   retries: process.env.CI ? 2 : 0,
 
   reporter: [

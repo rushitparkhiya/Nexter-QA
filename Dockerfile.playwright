@@ -1,0 +1,32 @@
+# Nexter-QA — Playwright Test Runner
+# Custom image based on the official Microsoft Playwright image.
+# Includes Node.js 20, all browsers, OS deps, and our project deps.
+
+FROM mcr.microsoft.com/playwright:v1.44.0-jammy
+
+# Set working directory to match where we'll mount the repo
+WORKDIR /workspace
+
+# Speed up apt installs and add common tools used by some scripts
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+      curl jq python3 ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+# Pre-install npm deps for faster startup once the volume is mounted.
+# These are copied once at build; mounted volume will overlay these.
+COPY package*.json ./
+
+# Use --omit=dev to skip dev-only deps we don't need for running tests
+# but Playwright IS in devDeps so we install all
+RUN npm ci || npm install
+
+# Pre-warm Playwright browsers (they're already in the base image, but
+# this guarantees the project's pinned version matches)
+RUN npx playwright install --with-deps chromium firefox webkit || true
+
+# Default: run the full SEO suite. Override with `docker run ... <cmd>`.
+ENV CI=true
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+
+CMD ["npm", "run", "seo:all"]

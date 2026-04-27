@@ -1,0 +1,20 @@
+# Don't copy these into the Docker image build context
+node_modules
+.auth
+reports
+test-results
+.git
+.github
+.vscode
+.idea
+*.log
+*.md
+!package.json
+!package-lock.json
+!Dockerfile.playwright
+.env
+.env.*
+zips/*.zip
+docker-compose.yml
+.dockerignore
+.gitignore

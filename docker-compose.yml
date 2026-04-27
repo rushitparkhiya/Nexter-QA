@@ -11,6 +11,8 @@ services:
       MYSQL_PASSWORD: wordpress
     volumes:
       - db_data:/var/lib/mysql
+    networks:
+      - nexter-net
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
       interval: 10s
@@ -35,6 +37,8 @@ services:
     volumes:
       - wp_data:/var/www/html
       - ./zips:/zips
+    networks:
+      - nexter-net
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80"]
       interval: 15s
@@ -56,18 +60,87 @@ services:
     volumes:
       - wp_data:/var/www/html
       - ./zips:/zips
+    networks:
+      - nexter-net
     user: "33:33"
     entrypoint: ["sh", "-c"]
     command:
       - |
         wp core install --path=/var/www/html --url=http://localhost:8882 --title='Nexter QA' --admin_user=admin --admin_password=password --admin_email=qa@nexter.test --skip-email || true
+
+        # Make siteurl/home dynamic based on HTTP_HOST so the same install
+        # works for both:
+        #   - browser access on http://localhost:8882
+        #   - test container on http://nexter-qa-wordpress
+        if ! grep -q "WP_HOME" /var/www/html/wp-config.php; then
+          echo "[wp-setup] Adding dynamic WP_HOME/WP_SITEURL"
+          awk '/Add any custom values between/ && !done {
+            print "/* Dynamic siteurl based on request — supports Docker network + host */";
+            print "if (!defined(\"WP_HOME\")) {";
+            print "  $$_proto = (!empty($$_SERVER[\"HTTPS\"]) && $$_SERVER[\"HTTPS\"] !== \"off\") ? \"https\" : \"http\";";
+            print "  $$_host  = $$_SERVER[\"HTTP_HOST\"] ?? \"localhost:8882\";";
+            print "  define(\"WP_HOME\",    $$_proto . \"://\" . $$_host);";
+            print "  define(\"WP_SITEURL\", $$_proto . \"://\" . $$_host);";
+            print "}";
+            done=1;
+          } { print }' /var/www/html/wp-config.php > /tmp/wp-config.php && \
+          mv /tmp/wp-config.php /var/www/html/wp-config.php
+        fi
+
         for zip in /zips/*.zip; do
           [ -f "$$zip" ] || continue
           echo "Installing plugin: $$zip"
           wp plugin install "$$zip" --activate --force --path=/var/www/html
         done
-        echo "WordPress ready at http://localhost:8882"
+        echo "WordPress ready at http://localhost:8882 (browser) and http://nexter-qa-wordpress (Docker network)"
+
+  # ── Playwright Test Runner ──────────────────────────────────────────────────
+  # Runs the full Playwright suite inside Docker, talking to the wordpress
+  # container directly via the internal network.
+  #
+  # Usage:
+  #   docker compose up -d db wordpress wp-setup     # bring up WP first
+  #   docker compose run --rm playwright              # run default (seo:all)
+  #   docker compose run --rm playwright npm run seo:dashboard
+  #   docker compose run --rm playwright npx playwright test --project=firefox
+  playwright:
+    build:
+      context: .
+      dockerfile: Dockerfile.playwright
+    container_name: nexter-qa-playwright
+    depends_on:
+      wordpress:
+        condition: service_healthy
+    networks:
+      - nexter-net
+    # We talk to WordPress via Docker DNS (`nexter-qa-wordpress`).
+    # WordPress is configured with dynamic WP_HOME/WP_SITEURL based on the
+    # HTTP_HOST header (see wp-setup), so it responds correctly for both
+    # this container's hostname AND host-browser localhost:8882.
+    environment:
+      WP_TEST_URL: "http://nexter-qa-wordpress"
+      WP_ADMIN_URL: "http://nexter-qa-wordpress/wp-admin"
+      CI: "true"
+      PLAYWRIGHT_WORKERS: "4"
+      DEBIAN_FRONTEND: noninteractive
+    volumes:
+      # Mount the entire project directory so source changes are picked up
+      # without rebuilding the image.
+      - ./:/workspace
+      # Persist node_modules separately to avoid Windows->Linux pollution
+      - playwright_node_modules:/workspace/node_modules
+      # Persist Playwright browser cache across runs
+      - playwright_cache:/ms-playwright
+    working_dir: /workspace
+    # Default: run the full SEO suite. Override at runtime to target subsets.
+    command: ["npm", "run", "seo:all"]
+
+networks:
+  nexter-net:
+    driver: bridge
 
 volumes:
   db_data:
   wp_data:
+  playwright_node_modules:
+  playwright_cache:
