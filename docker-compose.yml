@@ -64,7 +64,7 @@ services:
         for zip in /zips/*.zip; do
           [ -f "$$zip" ] || continue
           echo "Installing plugin: $$zip"
-          wp plugin install "$$zip" --activate --path=/var/www/html
+          wp plugin install "$$zip" --activate --force --path=/var/www/html
         done
         echo "WordPress ready at http://localhost:8882"
 
