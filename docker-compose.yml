@@ -1,0 +1,72 @@
+version: '3.9'
+
+services:
+
+  db:
+    image: mysql:8.0
+    container_name: nexter-qa-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  wordpress:
+    image: wordpress:latest
+    container_name: nexter-qa-wordpress
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8881:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DEBUG: "true"
+    volumes:
+      - wp_data:/var/www/html
+      - ./plugins:/var/www/html/wp-content/plugins/nexter-qa
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+  wp-setup:
+    image: wordpress:cli
+    container_name: nexter-qa-setup
+    depends_on:
+      wordpress:
+        condition: service_healthy
+    restart: "no"
+    volumes:
+      - wp_data:/var/www/html
+    user: "33:33"
+    entrypoint: >
+      sh -c "
+        wp core install
+          --url=http://localhost:8881
+          --title='Nexter QA'
+          --admin_user=admin
+          --admin_password=password
+          --admin_email=qa@nexter.test
+          --skip-email
+          --path=/var/www/html &&
+        wp plugin activate nexter-qa --path=/var/www/html || true &&
+        echo 'WordPress ready at http://localhost:8881'
+      "
+
+volumes:
+  db_data:
+  wp_data:
