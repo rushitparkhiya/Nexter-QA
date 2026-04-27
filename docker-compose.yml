@@ -36,7 +36,7 @@ services:
       WORDPRESS_DEBUG: "true"
     volumes:
       - wp_data:/var/www/html
-      - ./plugins:/var/www/html/wp-content/plugins/nexter-qa
+      - ./zips:/zips
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:80"]
       interval: 15s
@@ -52,6 +52,7 @@ services:
     restart: "no"
     volumes:
       - wp_data:/var/www/html
+      - ./zips:/zips
     user: "33:33"
     entrypoint: >
       sh -c "
@@ -63,7 +64,11 @@ services:
           --admin_email=qa@nexter.test
           --skip-email
           --path=/var/www/html &&
-        wp plugin activate nexter-qa --path=/var/www/html || true &&
+        for zip in /zips/*.zip; do
+          [ -f \"$$zip\" ] || continue;
+          echo \"Installing plugin: $$zip\";
+          wp plugin install \"$$zip\" --activate --path=/var/www/html;
+        done &&
         echo 'WordPress ready at http://localhost:8881'
       "
 
