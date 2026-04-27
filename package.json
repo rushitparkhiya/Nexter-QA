@@ -13,7 +13,25 @@
     "report": "playwright show-report reports/playwright-html",
     "install-deps": "bash setup/install.sh",
     "uat": "npx playwright test --config=tests/playwright/playwright.config.js --project=video --reporter=line && python3 scripts/generate-uat-report.py --title 'UAT Report' --snaps reports/screenshots/flows-compare --videos reports/videos --out reports/uat-report.html && npx open-cli reports/uat-report.html",
-    "uat:ci": "npx playwright test --config=tests/playwright/playwright.config.js --project=video --reporter=line && python3 scripts/generate-uat-report.py --title 'UAT Report' --snaps reports/screenshots/flows-compare --videos reports/videos --out reports/uat-report.html"
+    "uat:ci": "npx playwright test --config=tests/playwright/playwright.config.js --project=video --reporter=line && python3 scripts/generate-uat-report.py --title 'UAT Report' --snaps reports/screenshots/flows-compare --videos reports/videos --out reports/uat-report.html",
+
+    "seo": "npx playwright test tests/playwright/flows/nexter-seo/ --project=chromium",
+    "seo:headed": "npx playwright test tests/playwright/flows/nexter-seo/ --project=chromium --headed",
+    "seo:ui": "npx playwright test tests/playwright/flows/nexter-seo/ --ui",
+    "seo:dashboard": "npx playwright test tests/playwright/flows/nexter-seo/seo-dashboard.spec.js --project=chromium",
+    "seo:meta": "npx playwright test tests/playwright/flows/nexter-seo/seo-meta-templates.spec.js --project=chromium",
+    "seo:social": "npx playwright test tests/playwright/flows/nexter-seo/seo-social.spec.js --project=chromium",
+    "seo:robots": "npx playwright test tests/playwright/flows/nexter-seo/seo-robots.spec.js --project=chromium",
+    "seo:sitemap": "npx playwright test tests/playwright/flows/nexter-seo/seo-sitemap.spec.js --project=chromium",
+    "seo:schema": "npx playwright test tests/playwright/flows/nexter-seo/seo-schema.spec.js --project=chromium",
+    "seo:image": "npx playwright test tests/playwright/flows/nexter-seo/seo-image.spec.js --project=chromium",
+    "seo:indexing": "npx playwright test tests/playwright/flows/nexter-seo/seo-instant-indexing.spec.js --project=chromium",
+    "seo:llms": "npx playwright test tests/playwright/flows/nexter-seo/seo-llms.spec.js --project=chromium",
+    "seo:redirections": "npx playwright test tests/playwright/flows/nexter-seo/seo-redirections.spec.js --project=chromium",
+    "seo:404": "npx playwright test tests/playwright/flows/nexter-seo/seo-404-monitor.spec.js --project=chromium",
+    "seo:validation": "npx playwright test tests/playwright/flows/nexter-seo/seo-validation.spec.js --project=chromium",
+    "seo:import-export": "npx playwright test tests/playwright/flows/nexter-seo/seo-import-export.spec.js --project=chromium",
+    "seo:report": "playwright show-report reports/playwright-html"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.9.1",
