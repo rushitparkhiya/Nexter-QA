@@ -8,7 +8,7 @@ const {
 
 const SEO_PAGE         = 'nxt_content_seo';
 const REDIRECTIONS_HASH = '#/redirections';
-const BASE_URL          = process.env.WP_TEST_URL || 'http://localhost:8881';
+const BASE_URL          = process.env.WP_TEST_URL || 'http://localhost:8882';
 
 async function gotoRedirections(page) {
   await page.goto(`${BASE_URL}/wp-admin/admin.php?page=${SEO_PAGE}${REDIRECTIONS_HASH}`);

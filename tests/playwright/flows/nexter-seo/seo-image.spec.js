@@ -8,7 +8,7 @@ const {
 
 const SEO_PAGE   = 'nxt_content_seo';
 const IMAGE_HASH = '#/image-seo';
-const BASE_URL   = process.env.WP_TEST_URL || 'http://localhost:8881';
+const BASE_URL   = process.env.WP_TEST_URL || 'http://localhost:8882';
 
 async function gotoImageSeo(page) {
   await page.goto(`${BASE_URL}/wp-admin/admin.php?page=${SEO_PAGE}${IMAGE_HASH}`);

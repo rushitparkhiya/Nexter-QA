@@ -9,7 +9,7 @@ const {
 const SEO_PAGE      = 'nxt_content_seo';
 const ROBOTS_HASH   = '#/robots';
 const ROBOTS_TXT    = '#/robots-txt-editor';
-const BASE_URL      = process.env.WP_TEST_URL || 'http://localhost:8881';
+const BASE_URL      = process.env.WP_TEST_URL || 'http://localhost:8882';
 
 async function gotoRobots(page, hash = ROBOTS_HASH) {
   await page.goto(`${BASE_URL}/wp-admin/admin.php?page=${SEO_PAGE}${hash}`);

@@ -13,7 +13,7 @@ const META_HASH = '#/meta-templates';
 test.describe('Nexter SEO — Meta Templates', () => {
 
   test.beforeEach(async ({ page }) => {
-    await page.goto(`http://localhost:8881/wp-admin/admin.php?page=${SEO_PAGE}${META_HASH}`);
+    await page.goto(`http://localhost:8882/wp-admin/admin.php?page=${SEO_PAGE}${META_HASH}`);
     await page.waitForLoadState('domcontentloaded');
     await page.waitForLoadState('networkidle').catch(() => {});
     await page.waitForTimeout(1500);

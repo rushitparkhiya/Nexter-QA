@@ -9,7 +9,7 @@ const {
 
 const SEO_PAGE    = 'nxt_content_seo';
 const SOCIAL_HASH = '#/social';
-const BASE_URL    = process.env.WP_TEST_URL || 'http://localhost:8881';
+const BASE_URL    = process.env.WP_TEST_URL || 'http://localhost:8882';
 
 async function gotoSocial(page) {
   await page.goto(`${BASE_URL}/wp-admin/admin.php?page=${SEO_PAGE}${SOCIAL_HASH}`);

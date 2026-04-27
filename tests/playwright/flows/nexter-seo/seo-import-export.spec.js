@@ -10,7 +10,7 @@ const {
 
 const SEO_PAGE         = 'nxt_content_seo';
 const IMPORT_HASH      = '#/import-export';
-const BASE_URL         = process.env.WP_TEST_URL || 'http://localhost:8881';
+const BASE_URL         = process.env.WP_TEST_URL || 'http://localhost:8882';
 const EXPORT_SAVE_PATH = path.join(process.cwd(), 'reports', 'nexter-seo-export.json');
 
 async function gotoImportExport(page) {

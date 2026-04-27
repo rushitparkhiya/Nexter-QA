@@ -8,7 +8,7 @@ const {
 
 const SEO_PAGE     = 'nxt_content_seo';
 const SITEMAP_HASH = '#/sitemap';
-const BASE_URL     = process.env.WP_TEST_URL || 'http://localhost:8881';
+const BASE_URL     = process.env.WP_TEST_URL || 'http://localhost:8882';
 
 async function gotoSitemap(page) {
   await page.goto(`${BASE_URL}/wp-admin/admin.php?page=${SEO_PAGE}${SITEMAP_HASH}`);

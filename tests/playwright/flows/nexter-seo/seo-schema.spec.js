@@ -9,7 +9,7 @@ const {
 
 const SEO_PAGE    = 'nxt_content_seo';
 const SCHEMA_HASH = '#/schema';
-const BASE_URL    = process.env.WP_TEST_URL || 'http://localhost:8881';
+const BASE_URL    = process.env.WP_TEST_URL || 'http://localhost:8882';
 
 async function gotoSchema(page) {
   await page.goto(`${BASE_URL}/wp-admin/admin.php?page=${SEO_PAGE}${SCHEMA_HASH}`);

@@ -18,7 +18,7 @@ const fs   = require('fs');
 
 const ADMIN_BASE = process.env.WP_TEST_URL
   ? `${process.env.WP_TEST_URL}/wp-admin`
-  : 'http://localhost:8881/wp-admin';
+  : 'http://localhost:8882/wp-admin';
 
 // ─── Error patterns ────────────────────────────────────────────────────────────
 
