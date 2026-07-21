@@ -1,0 +1,29 @@
+{
+  "_status": "SCHEMA STUB — populate from a fully-configured live site (see fixtures/README.md). The seeder in run-regression-core.sh stage 3 consumes this.",
+  "options": {
+    "_how": "replay each key with `wp option update <key> <json>`. Source of truth = golden-options.json exported from rushit.instawp.link.",
+    "nexter_site_security": { "limit-login": { "switch": "on" }, "custom-login": { "switch": "on", "path": "secret-login" }, "2-fac-authentication": { "switch": "on" } },
+    "nexter_site_performance": { "image-upload-optimize": { "switch": "on", "format": "webp" }, "heartbeat": { "switch": "on" } }
+  },
+  "seo": {
+    "meta_template": { "title": "%%title%% - %%sitename%%", "description": "%%excerpt%%" },
+    "og_default_image_id": 0,
+    "schema_rules": [{ "type": "Article", "condition": "post" }],
+    "sitemap": { "enabled": true, "types": ["post", "page"] },
+    "redirects": [{ "from": "/old-url", "to": "/", "code": 301 }],
+    "robots": { "post": { "index": true, "follow": true } },
+    "indexnow": { "enabled": true },
+    "llms_txt": { "enabled": true }
+  },
+  "theme_builder_templates": [
+    { "title": "QA Header", "type": "header", "builder": "elementor" },
+    { "title": "QA Footer", "type": "footer", "builder": "gutenberg" },
+    { "title": "QA 404", "type": "404", "builder": "elementor" }
+  ],
+  "code_snippets": [
+    { "title": "QA CSS snippet", "language": "css", "code": "body{--qa:1}" }
+  ],
+  "content": {
+    "posts": 1, "pages": 1, "products": 1
+  }
+}

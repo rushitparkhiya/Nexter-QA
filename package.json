@@ -14,7 +14,6 @@
     "install-deps": "bash setup/install.sh",
     "uat": "npx playwright test --config=tests/playwright/playwright.config.js --project=video --reporter=line && python3 scripts/generate-uat-report.py --title 'UAT Report' --snaps reports/screenshots/flows-compare --videos reports/videos --out reports/uat-report.html && npx open-cli reports/uat-report.html",
     "uat:ci": "npx playwright test --config=tests/playwright/playwright.config.js --project=video --reporter=line && python3 scripts/generate-uat-report.py --title 'UAT Report' --snaps reports/screenshots/flows-compare --videos reports/videos --out reports/uat-report.html",
-
     "docker:up": "docker compose up -d db wordpress",
     "docker:setup": "docker compose run --rm wp-setup",
     "docker:down": "docker compose down",
@@ -29,7 +28,6 @@
     "docker:shell": "docker compose run --rm playwright bash",
     "docker:run": "bash scripts/docker-run-tests.sh",
     "docker:run:fresh": "bash scripts/docker-run-tests.sh --fresh --report",
-
     "seo": "npx playwright test tests/playwright/flows/nexter-seo/ --config=tests/playwright/playwright.config.js --project=chromium",
     "seo:headed": "npx playwright test tests/playwright/flows/nexter-seo/ --config=tests/playwright/playwright.config.js --project=chromium --headed",
     "seo:ui": "npx playwright test tests/playwright/flows/nexter-seo/ --config=tests/playwright/playwright.config.js --ui",
@@ -47,7 +45,6 @@
     "seo:validation": "npx playwright test tests/playwright/flows/nexter-seo/seo-validation.spec.js --config=tests/playwright/playwright.config.js --project=chromium",
     "seo:import-export": "npx playwright test tests/playwright/flows/nexter-seo/seo-import-export.spec.js --config=tests/playwright/playwright.config.js --project=chromium",
     "seo:report": "npx playwright show-report reports/playwright-html",
-
     "seo:post-editor": "npx playwright test tests/playwright/flows/nexter-seo/seo-post-editor.spec.js --config=tests/playwright/playwright.config.js --project=chromium",
     "seo:persist": "npx playwright test tests/playwright/flows/nexter-seo/seo-persist.spec.js --config=tests/playwright/playwright.config.js --project=chromium",
     "seo:frontend-meta": "npx playwright test tests/playwright/flows/nexter-seo/seo-frontend-meta.spec.js --config=tests/playwright/playwright.config.js --project=chromium",
@@ -78,7 +75,6 @@
     "seo:indexing-advanced": "npx playwright test tests/playwright/flows/nexter-seo/seo-indexing-advanced.spec.js --config=tests/playwright/playwright.config.js --project=chromium",
     "seo:llms-advanced": "npx playwright test tests/playwright/flows/nexter-seo/seo-llms-advanced.spec.js --config=tests/playwright/playwright.config.js --project=chromium",
     "seo:workflow": "npx playwright test tests/playwright/flows/nexter-seo/seo-multipage-workflow.spec.js --config=tests/playwright/playwright.config.js --project=chromium",
-
     "seo:woocommerce": "npx playwright test tests/playwright/flows/nexter-seo/seo-woocommerce.spec.js --config=tests/playwright/playwright.config.js --project=chromium",
     "seo:i18n": "npx playwright test tests/playwright/flows/nexter-seo/seo-i18n-rtl.spec.js --config=tests/playwright/playwright.config.js --project=chromium",
     "seo:block-editor": "npx playwright test tests/playwright/flows/nexter-seo/seo-block-editor.spec.js --config=tests/playwright/playwright.config.js --project=chromium",
@@ -100,12 +96,43 @@
     "seo:frontend-coverage": "npx playwright test tests/playwright/flows/nexter-seo/seo-frontend-coverage.spec.js --config=tests/playwright/playwright.config.js --project=chromium",
     "seo:link-validation": "npx playwright test tests/playwright/flows/nexter-seo/seo-link-validation.spec.js --config=tests/playwright/playwright.config.js --project=chromium",
     "seo:edge-cases": "npx playwright test tests/playwright/flows/nexter-seo/seo-edge-cases.spec.js --config=tests/playwright/playwright.config.js --project=chromium",
-
-    "seo:all": "npx playwright test tests/playwright/flows/nexter-seo/ --config=tests/playwright/playwright.config.js --project=chromium"
+    "seo:all": "npx playwright test tests/playwright/flows/nexter-seo/ --config=tests/playwright/playwright.config.js --project=chromium",
+    "theme:all": "npx playwright test tests/playwright/flows/nexter-theme/ --config=tests/playwright/playwright.config.js --project=chromium --reporter=html,line",
+    "theme:install": "npx playwright test tests/playwright/flows/nexter-theme/01-installation.spec.js --config=tests/playwright/playwright.config.js --project=chromium",
+    "theme:header": "npx playwright test tests/playwright/flows/nexter-theme/02-header.spec.js --config=tests/playwright/playwright.config.js --project=chromium",
+    "theme:footer": "npx playwright test tests/playwright/flows/nexter-theme/03-footer.spec.js --config=tests/playwright/playwright.config.js --project=chromium",
+    "theme:homepage": "npx playwright test tests/playwright/flows/nexter-theme/04-homepage.spec.js --config=tests/playwright/playwright.config.js --project=chromium",
+    "theme:pages": "npx playwright test tests/playwright/flows/nexter-theme/05-pages-blog.spec.js --config=tests/playwright/playwright.config.js --project=chromium",
+    "theme:gutenberg": "npx playwright test tests/playwright/flows/nexter-theme/06-gutenberg.spec.js --config=tests/playwright/playwright.config.js --project=chromium",
+    "theme:elementor": "npx playwright test tests/playwright/flows/nexter-theme/07-elementor.spec.js --config=tests/playwright/playwright.config.js --project=chromium",
+    "theme:customizer": "npx playwright test tests/playwright/flows/nexter-theme/08-customizer.spec.js --config=tests/playwright/playwright.config.js --project=chromium",
+    "theme:responsive": "npx playwright test tests/playwright/flows/nexter-theme/09-responsive.spec.js --config=tests/playwright/playwright.config.js --project=chromium",
+    "theme:performance": "npx playwright test tests/playwright/flows/nexter-theme/10-performance.spec.js --config=tests/playwright/playwright.config.js --project=chromium",
+    "theme:a11y": "npx playwright test tests/playwright/flows/nexter-theme/11-accessibility.spec.js --config=tests/playwright/playwright.config.js --project=chromium",
+    "theme:seo": "npx playwright test tests/playwright/flows/nexter-theme/12-seo.spec.js --config=tests/playwright/playwright.config.js --project=chromium",
+    "theme:security": "npx playwright test tests/playwright/flows/nexter-theme/13-security.spec.js --config=tests/playwright/playwright.config.js --project=chromium",
+    "theme:woocommerce": "npx playwright test tests/playwright/flows/nexter-theme/14-woocommerce.spec.js --config=tests/playwright/playwright.config.js --project=chromium",
+    "theme:console": "npx playwright test tests/playwright/flows/nexter-theme/15-console-errors.spec.js --config=tests/playwright/playwright.config.js --project=chromium",
+    "theme:visual": "npx playwright test tests/playwright/flows/nexter-theme/16-visual-regression.spec.js --config=tests/playwright/playwright.config.js --project=visual",
+    "theme:visual:update": "npx playwright test tests/playwright/flows/nexter-theme/16-visual-regression.spec.js --config=tests/playwright/playwright.config.js --project=visual --update-snapshots",
+    "theme:firefox": "npx playwright test tests/playwright/flows/nexter-theme/ --config=tests/playwright/playwright.config.js --project=firefox",
+    "theme:webkit": "npx playwright test tests/playwright/flows/nexter-theme/ --config=tests/playwright/playwright.config.js --project=webkit",
+    "theme:mobile": "npx playwright test tests/playwright/flows/nexter-theme/ --config=tests/playwright/playwright.config.js --project=mobile-chrome",
+    "regress:agent": "bash scripts/run-regression-agent.sh",
+    "regress:free": "bash scripts/run-regression-core.sh --edition free",
+    "regress:pro": "bash scripts/run-regression-core.sh --edition pro",
+    "regress:static": "bash scripts/regress-static.sh",
+    "regress:discover": "bash scripts/discover-nexter-surface.sh",
+    "regress:seo-capture": "bash scripts/capture-seo-outputs.sh"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.9.1",
     "@playwright/test": "^1.44.0",
     "@wp-playground/cli": "^0.9.0"
+  },
+  "dependencies": {
+    "marked": "^12.0.2",
+    "node-poppler": "^9.1.2",
+    "sharp": "^0.35.3"
   }
 }

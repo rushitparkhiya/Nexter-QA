@@ -1,0 +1,81 @@
+{
+  "_comment": "Nexter Extension test surface — the module inventory the regression engine walks. Auto-refresh with `bash scripts/discover-nexter-surface.sh --zip zips/nexter-free-<ver>.zip`. Keys are best-effort from 4.7.0 source; the discover script overwrites option-keys it can confirm live.",
+  "version_captured": "4.7.0",
+  "editions": {
+    "free": {
+      "slug": "nexter-extension",
+      "main_file": "nexter-extension/nexter-extension.php",
+      "text_domain": "nexter-extension",
+      "version_const": "NEXTER_EXT_VER",
+      "cpt": "nxt_builder",
+      "activation_side_effects": [
+        "creates login-attempt DB table (Nexter_Ext_Activation::create_login_attempt_table)",
+        "writes option nexter-ext-install-data (install-version, install-date)",
+        "flush_rewrite_rules() for nxt_builder CPT",
+        "admin_init version-gated rewrite re-flush (nexter_ext_rewrite_ver vs NEXTER_EXT_REWRITE_VER)"
+      ]
+    },
+    "pro": {
+      "slug": "nexter-pro-extensions",
+      "main_file": "nexter-pro-extensions/nexter-pro-extensions.php",
+      "text_domain": "nexter-pro-extensions",
+      "version_const": "NXT_PRO_EXT_VER",
+      "hard_depends_on_free": true,
+      "dependency_check": "requires NEXTER_EXT_VER defined; else shows install/activate-Free admin notice",
+      "license": { "store": "https://store.posimyth.com", "item_id": 99121, "updater": "Nexter_SL_Plugin_Updater" },
+      "lazy_loaded": ["2FA (nexter_site_security 2-fac-authentication switch)", "image-optimization-pro (nexter_site_performance image-upload-optimize switch)"]
+    }
+  },
+  "surfaces": {
+    "seo": {
+      "_note": "HEADLINE new surface in 4.7.0 — entire content-seo/ tree. Highest regression priority. HTTP-output assertable.",
+      "root": "content-seo/",
+      "http_outputs": ["<title>+meta description", "og:* / twitter:*", "JSON-LD schema (18 types)", "canonical", "robots meta", "/sitemap.xml (+image/video/news/html)", "/robots.txt", "301/302 redirects", "IndexNow ping", "/llms.txt"],
+      "features": ["site-audit", "meta-templates", "social-og", "schema-builder", "xml-sitemaps", "robots-editor", "instant-indexing-indexnow", "llms-txt", "site-verification", "redirects-404-monitor", "image-seo", "import-export"],
+      "existing_specs": "tests/playwright/flows/nexter-seo/ (~70 specs already cover this live-config surface)"
+    },
+    "theme_builder": {
+      "root": "theme-builder/",
+      "cpt": "nxt_builder",
+      "template_types": ["header", "footer", "breadcrumbs", "404", "single", "archive"],
+      "builders": ["elementor", "gutenberg"],
+      "regression_focus": ["existing templates still render post-upgrade", "rewrite-rule auto-flush works (nexter-extension.php:148)"]
+    },
+    "abilities_mcp": {
+      "root": "include/abilities/",
+      "count": 26,
+      "api": "WP Abilities API (register_ability) + SproutOS",
+      "regression_focus": "all abilities still register after upgrade (4.6.15 shipped a bug where ALL failed to register)",
+      "files": ["templates (create/get/list/update/delete/toggle)", "snippets (create/get/list/update/delete/toggle)", "extensions (list/toggle)", "image-optimization", "security-settings", "performance-settings", "smtp-settings", "custom-fonts", "bulk-image-optimizer"]
+    },
+    "extensions_free": {
+      "root": "include/panel-settings/extensions/",
+      "note": "all toggle-gated — nothing loads unless switched on",
+      "modules": [
+        "smtp-email", "image-upload-optimize", "bulk-images", "adobe-font", "custom-upload-font", "local-google-font",
+        "limit-login-attempt", "google-captcha", "cloudflare-captcha (turnstile)", "custom-login-redirect",
+        "heartbeat-control", "svg-upload", "post-duplicator", "post-revision-control", "redirect-404-page",
+        "disable-gutenberg", "disable-elementor-icons", "elementor-adfree", "replace-url", "rollback-manager",
+        "clean-up-admin-bar", "disable-admin-settings", "view-admin-role", "wider-admin-menu", "wp-debug-mode",
+        "content-post-order", "image-sizes", "local-user-avatar"
+      ]
+    },
+    "extensions_pro": {
+      "root": "includes/settings-options/",
+      "modules": [
+        "two-factor-management (2FA)", "admin-menu-organizer", "clean-user-profile", "image-optimization-pro",
+        "local-user-avatar", "login-email-notification", "media-replacement", "performance-security",
+        "public-preview-drafts", "redirect-404-page", "right-click-disable", "taxonomy-order", "wp-login-white-label"
+      ],
+      "sections_hooks": ["maintenance-mode", "advanced-maintenance"],
+      "code_snippets": ["render-pro", "simple-html-dom"]
+    },
+    "code_snippets": {
+      "note": "PHP/CSS/JS/HTML manager — legitimately uses eval(). HIGHEST security-review surface; keep under permanent watch.",
+      "eval_sites_free": ["nexter-code-file-snippet.php", "nexter-code-snippet-render.php", "nexter-php-code-handling.php", "nexter-ecommerce-code-handler.php", "nexter-page-specific-code-handler.php"],
+      "eval_sites_pro": ["nexter-code-snippet-render-pro.php"]
+    }
+  },
+  "conflict_targets": ["Yoast SEO", "RankMath", "WooCommerce", "The Plus Addons (TPAE)", "Sticky Header Effects", "Elementor"],
+  "known_option_keys": ["nexter_site_security", "nexter_site_performance", "nexter_white_label", "nexter-ext-install-data", "nexter_ext_rewrite_ver", "nexter_activate"]
+}
